@@ -50,7 +50,7 @@ export default class Countctt extends Component {
         document.getElementById('countPage').style.display = "block";
         this.setState({ loading : false });
 
-        this.state.count = 0;  //set count number to zero
+        this.setState.count = 0;  //set count number to zero
       })
       .catch(error => {
         console.log(error)

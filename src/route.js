@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import App from "./App";
 import Register from './Register';
 import Count2ten from './Count2ten';
 

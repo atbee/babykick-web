@@ -3,7 +3,6 @@ import { Form, Button} from "react-bootstrap";
 // import Button from 'react-bootstrap-button-loader';
 import './App.css';
 import axios from 'axios';
-import { timeout } from 'q';
 
 const liff = window.liff;
 
