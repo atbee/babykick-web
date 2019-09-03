@@ -88,7 +88,7 @@ export default class Register extends Component {
               <Form.Group>
                 <Form.Control
                   required
-                  // className="hide"
+                  className="hide"
                   name="line_id"
                   type="text"
                   placeholder="Line ID"
