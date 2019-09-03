@@ -9,14 +9,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #f3ccd7;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: black;
 }
 
 .App-link {
@@ -30,4 +30,60 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* REGISTER PAGE */
+
+.form {
+  margin-top: 20px;
+}
+
+.form-control {
+  display: inline !important;
+  font-size: 0.8rem !important;
+  padding: 1.1rem 1.5rem;
+}
+
+.hide {
+  visibility: hidden !important;
+  display: none !important;
+}
+
+input {
+  text-align: center;
+}
+
+::-webkit-input-placeholder {
+  text-align: center;
+}
+
+body {
+  font-family: 'Mali';
+  font-weight: bold;
+}
+
+button {
+  color: white !important ;
+  background-color: #db5e88 !important;
+  border-color: #db5e88 !important;
+}
+
+img {
+  height: 120px;
+  margin-top: 20px;
+}
+
+/* COUNT PAGE */
+.dec-margin {
+  margin-right: 4rem;
+  font-size: 1.75rem !important;
+}
+
+.inc-margin {
+  margin-left: 4rem;
+  font-size: 1.75rem !important;
+}
+
+.Count-ctt {
+  font-size: 3rem;
 }
