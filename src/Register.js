@@ -51,7 +51,7 @@ export default class Register extends Component {
     e.preventDefault()
     this.setState({ loading : true });
     axios
-      .post('http://103.74.254.168:3000//register', this.state)
+      .post('http://103.74.254.168:3000/register', this.state)
       .then(response => {
         console.log(response)
         console.log('ลงทะเบียนสำเร็จ!')
@@ -98,7 +98,7 @@ export default class Register extends Component {
               <Form.Group>
                 <Form.Control
                   required
-                  className="hide"
+                  // className="hide"
                   name="line_id"
                   type="text"
                   placeholder="Line ID"
