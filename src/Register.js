@@ -40,7 +40,7 @@ export default class Register extends Component {
     e.preventDefault()
     this.setState({ loading : true });
     axios
-      .post('http://103.74.254.168:3000/register', this.state)
+      .post('https://babykick-api.herokuapp.com/register', this.state)
       .then(response => {
         console.log(response)
         console.log('ลงทะเบียนสำเร็จ!')
@@ -64,15 +64,14 @@ export default class Register extends Component {
         setTimeout(()=> {
           this.setState({ loading : false });
           document.getElementById('regisFailed').style.display = "none";
-          document.getElementById('regisForm').style.display = "block";
+          document.getElementById('regisForm').style.display = "inline";
         }, 2000)
 
       })
   }
 
   render() {
-    const { line_id, mom_age, ges_age_week } = this.state;
-    const { loading } = this.state;
+    const { line_id, mom_age, ges_age_week,loading } = this.state;
     return (
       <div className="App">
         <header className="App-header">
@@ -80,6 +79,8 @@ export default class Register extends Component {
           {/* <div className="Show-data">
             {this.state.line_id}
           </div> */}
+
+          {/* the problem for register page right now is it cannot detect username that already register */}
 
           <div id="regisForm" className="form">
             <Form onSubmit={this.submitHandler}>
@@ -121,7 +122,7 @@ export default class Register extends Component {
                   onChange={this.changeHandler}/>
               </Form.Group>
 
-              <Button className="" variant="danger" type="submit" disabled={loading}>
+              <Button variant="danger" type="submit" disabled={loading}>
                 {loading ? 'กำลังโหลด…' : 'ยืนยันข้อมูล'}
               </Button>
 

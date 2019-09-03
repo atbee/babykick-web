@@ -42,7 +42,7 @@ export default class Countctt extends Component {
     console.log(this.state)
     this.setState({ loading : true });  //set button state to loading (UX)
     axios
-      .post('http://103.74.254.168:3000/timer/counttoten', this.state)
+      .post('https://babykick-api.herokuapp.com/timer/counttoten', this.state)
       .then(response => {
         console.log(response)
 
@@ -50,7 +50,7 @@ export default class Countctt extends Component {
         document.getElementById('countPage').style.display = "block";
         this.setState({ loading : false });
 
-        this.setState.count = 0;  //set count number to zero
+        this.setState.count = 0;
       })
       .catch(error => {
         console.log(error)
@@ -64,7 +64,7 @@ export default class Countctt extends Component {
     this.setState({ loading : true });  //set button state to loading (UX)
     const { line_id } = this.state;
     axios
-      .post('http://103.74.254.168:3000/ctt/increasing/' + line_id, this.state)
+      .post('https://babykick-api.herokuapp.com/ctt/increasing/' + line_id, this.state)
       .then(response => {
         console.log(response)
         this.setState({ data: response.data })
@@ -96,7 +96,7 @@ export default class Countctt extends Component {
     this.setState({ loading : true });  //set button state to loading (UX)
     const { line_id } = this.state;
     axios
-      .post('http://103.74.254.168:3000/ctt/decreasing/' + line_id, this.state)
+      .post('https://babykick-api.herokuapp.com/ctt/decreasing/' + line_id, this.state)
       .then(response => {
         console.log(response)
         this.setState({ data: response.data })
