@@ -26,21 +26,10 @@ export default class Register extends Component {
       loading: false
     };
     this.initialize = this.initialize.bind(this);
-    this.closeApp = this.closeApp.bind(this);
   }
 
   componentDidMount() {
     window.addEventListener('load', this.initialize);
-  }
-
-  closeApp(event) {
-    event.preventDefault();
-    liff.sendMessages([{
-      type: 'text',
-      text: "ลงทะเบียนเรียบร้อย"
-    }]).then(() => {
-      liff.closeWindow();
-    });
   }
 
   changeHandler = e => {
@@ -144,7 +133,9 @@ export default class Register extends Component {
           </div>
 
           <div id="regisFailed" style={{ display: 'none', marginTop : '50px' }}> 
-          ลงทะเบียนไม่สำเร็จ! กรุณาลองใหม่อีกครั้งค่ะ
+          ลงทะเบียนไม่สำเร็จ! 
+          <br></br>
+          กรุณาลองใหม่อีกครั้งค่ะ
           </div>
 
         </header>
