@@ -188,16 +188,16 @@ export default class Countctt extends Component {
             {/* User enter count page (First time of day) */}
             <div id="newCount">
 
-              {this.state.line_id}
+              {/* {this.state.line_id} */}
 
-              {/* <Form.Group>
+              <Form.Group>
                 <Form.Control
                   name="line_id"
                   type="text"
                   placeholder="Line ID" 
                   value={line_id}
                   onChange={this.changeHandler} />
-              </Form.Group> */}
+              </Form.Group>
 
               <Button variant="danger" type="submit" onClick={this.beginHandler} disabled={loading}>
                 {loading ? 'กำลังโหลด…' : 'เริ่มนับ'}
@@ -224,7 +224,7 @@ export default class Countctt extends Component {
 
                     <Timer
                       initialTime={30000}
-                      startImmediately={false}
+                      startImmediately={true}
                       direction="backward"
                       checkpoints={[
                         {
