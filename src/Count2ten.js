@@ -43,7 +43,7 @@ export default class Countctt extends Component {
 
     //checktimer status
     axios
-      .post('http://babykick-api.herokuapp.com/timer/status', this.state)
+      .post('https://babykick-api.herokuapp.com/timer/status', this.state)
       .then(response => {
         console.log(response)
         this.setState({ status : response.data.timer_status})
@@ -55,7 +55,7 @@ export default class Countctt extends Component {
       // beginhandler that use for test only a short time
       this.setState({ loading : true });  //set button state to loading (UX)
       axios
-      .post('http://babykick-api.herokuapp.com/timer/counttoten', this.state)
+      .post('https://babykick-api.herokuapp.com/timer/counttoten', this.state)
       .then(response => {
         console.log(response)
         this.setState({ apitime : response.data.time}) // this is start time of count
@@ -84,7 +84,7 @@ export default class Countctt extends Component {
     e.preventDefault()
     this.setState({ loading : true });  //set button state to loading (UX)
     axios
-      .post('http://babykick-api.herokuapp.com/timer/counttoten', this.state)
+      .post('https://babykick-api.herokuapp.com/timer/counttoten', this.state)
       .then(response => {
         console.log(response)
         this.setState({ apitime : response.data.time}) // this is start time of count
@@ -110,7 +110,7 @@ export default class Countctt extends Component {
     const { line_id } = this.state;
 
     axios
-      .post('http://babykick-api.herokuapp.com/ctt/increasing/' + line_id, this.state)
+      .post('https://babykick-api.herokuapp.com/ctt/increasing/' + line_id, this.state)
       .then(response => {
         console.log(response)
         this.setState({ data: response.data })
@@ -150,7 +150,7 @@ export default class Countctt extends Component {
     this.setState({ loading : true });  //set button state to loading (UX)
     const { line_id } = this.state;
     axios
-      .post('http://babykick-api.herokuapp.com/ctt/decreasing/' + line_id, this.state)
+      .post('https://babykick-api.herokuapp.com/ctt/decreasing/' + line_id, this.state)
       .then(response => {
         console.log(response)
         this.setState({ data: response.data })
@@ -223,7 +223,7 @@ export default class Countctt extends Component {
                     {this.state.curtime} */}
 
                     <Timer
-                      initialTime={30000}
+                      initialTime={35000}
                       startImmediately={true}
                       direction="backward"
                       checkpoints={[
