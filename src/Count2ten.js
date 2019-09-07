@@ -33,12 +33,15 @@ export default class Countctt extends Component {
       minutes: undefined,
       seconds: undefined,
       timeTillDate: '',
-      timestamp:''
+      timestamp:'',
+      endTime: '',
+      leftTime: '',
+      startTime: ''
     };
     this.initialize = this.initialize.bind(this);
   }
 
-  componentDidMount() {
+  componentDidMount = async() => {
     window.addEventListener('load', this.initialize);
 
     //checktimer status and send user to new or continue count
@@ -64,26 +67,37 @@ export default class Countctt extends Component {
       })
 
       //get all time data
-      this.interval = setInterval(() => {
+      this.interval = setInterval(async() => {
         const { timeTillDate } = this.state;
         const timeFormat = "x";
-        const then = moment(timeTillDate, timeFormat);
         const now = moment().unix()*1000;
-        const countdown = moment(then + 60000 + (then - now), timeFormat);
+        const currentTime = moment(now).format('HH:mm:ss')
 
-        const days = countdown.format('D');
-        const hours = countdown.format('HH');
-        const minutes = countdown.format('mm');
-        const seconds = countdown.format('ss');
+        const startTime = moment(this.state.apitime, 'HH:mm:ss').subtract(7, "hours").format('HH:mm:ss') // Real time of this.state.apitime - 7 hours
+        const endTime = moment(this.state.apitime, 'HH:mm:ss').add(5, "hours").format('HH:mm:ss') // End time + 5 hours
+        
+        
+        console.log(currentTime)
 
+        const leftTime = moment.utc(moment(endTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format('HH:mm:ss')
+        console.log(leftTime)
+        const currentTime_test = moment(currentTime, 'HH:mm:ss').add(11, 'hours').add(59, 'minutes').add(50, 'seconds').format('HH:mm:ss') // test
+        console.log(currentTime, endTime)
+
+        console.log(this.state.apitime)
         // if time out
-        if(moment(then).isSame(countdown, 'second')) {
+        if(currentTime === endTime) {
           document.getElementById('badEnding').style.display = "block";
           document.getElementById('countPage').style.display = "none";
-          // liff.closeWindow();
         }
+        
+        // if(moment(then).isSame(countdown, 'second')) {
+        //   document.getElementById('badEnding').style.display = "block";
+        //   document.getElementById('countPage').style.display = "none";
+        //   // liff.closeWindow();
+        // }
 
-        this.setState({ days, hours, minutes, seconds });
+        await this.setState({ endTime, leftTime, startTime });
     }, 1000);
 
   }
@@ -132,11 +146,25 @@ export default class Countctt extends Component {
     axios
       .post('http://localhost:3001/ctt/increasing/' + line_id, this.state)
       .then(response => {
-        console.log(response.data)
-
+        // console.log(response.data[0])
+        let data_length = response.data.length
+        for (let i = 0; i < data_length; i++) {
+          if (i = data_length) {
+            console.log(response.data[i - 1])
+            let data = response.data[i - 1]
+            dataUser.push({
+              timestamp : data.timestamp,
+              time: data.time,
+              ctt_amount: data.ctt_amount
+            })
+          }
+        }
         
-        this.setState({ apitime : response.data.time}) // this is start time of count
-        this.setState({ timeTillDate : response.data.timestamp})
+        
+        this.setState({ apitime : dataUser[0].time }) // this is start time of count
+        this.setState({ timeTillDate : dataUser[0].timestamp })
+        this.setState({ count: dataUser[0].ctt_amount })
+        console.log(this.state.count)
 
         document.getElementById('continueCount').style.display = "none";
         document.getElementById('countPage').style.display = "block";
@@ -220,7 +248,7 @@ export default class Countctt extends Component {
   render() {
     const { line_id } = this.state;
     const { loading } = this.state;
-    const { hours, minutes, seconds } = this.state;
+    const { endTime, leftTime, startTime } = this.state;
     return (
       <div className="App">
         <header className="App-header">
@@ -281,13 +309,11 @@ export default class Countctt extends Component {
                 <Form.Group>
                   <Form.Label className="">
 
-                    {this.state.apitime}
-                    <br></br>
-                    {hours}:
-                    {minutes}:
-                    {seconds}
-
-                    {this.state.dataUser.map ((data) => <a key={data._id} > {data.timestamp} </a> )}
+                    {startTime}
+                    <br/>
+                    {leftTime}
+                    <br/>
+                    จบ ณ เวลา {endTime}
 
                   </Form.Label>
                 </Form.Group>
