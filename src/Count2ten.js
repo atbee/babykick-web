@@ -22,7 +22,7 @@ export default class Count2ten extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      line_id: 'U50240c7e4d230739b2a4343c4a1da542',
+      line_id: '',
       dataUser: [],
       count: 0,
       loading: false,
