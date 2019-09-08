@@ -5,8 +5,8 @@ import axios from 'axios';
 import moment from 'moment';
 
 const liff = window.liff;
-//const API = 'https://babykick-api.herokuapp.com';
-const API = 'http://localhost:3001';
+const API = 'https://babykick-api.herokuapp.com';
+//const API = 'http://localhost:3001';
 
 export default class Count2ten extends Component {
 
@@ -22,7 +22,7 @@ export default class Count2ten extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      line_id: '',
+      line_id: 'U50240c7e4d230739b2a4343c4a1da542',
       dataUser: [],
       count: 0,
       loading: false,
@@ -37,7 +37,8 @@ export default class Count2ten extends Component {
       timestamp:'',
       endTime: '',
       leftTime: '',
-      startTime: ''
+      startTime: '',
+      status_web: 'exit'
     };
     this.initialize = this.initialize.bind(this);
   }
@@ -94,9 +95,15 @@ export default class Count2ten extends Component {
     if (this.interval) {
         clearInterval(this.interval); 
     }
+    axios
+      .post(API + '/closeweb', this.state)
+      .then(response => {
+        console.log('Web is close')
+      })
+      .catch(error => {
+        console.log(error)
+      })
   }
-  // exit code = status_web == 'exit'
-
 
   // handle change in form (UID)
   changeHandler = e => {
@@ -138,13 +145,10 @@ export default class Count2ten extends Component {
       .then(response => {
         console.log(response.data)
         
-        let data_length = response.data.length
-        console.log(data_length)
-
+        let data_length = Number(response.data.length)
         for (let i = 0; i < data_length; i++) {
-          if (i === data_length) {
-            console.log(response.data[i - 1])
-            let data = response.data[i - 1]
+          if (i === data_length - 1) {
+            let data = response.data[i]
             dataUser.push({
               timestamp : data.timestamp,
               time: data.time,
@@ -152,7 +156,6 @@ export default class Count2ten extends Component {
             })
           }
         }
-        console.log(dataUser)
 
         this.setState({ apitime : dataUser[0].time }) // this is start time of count
         this.setState({ timeTillDate : dataUser[0].timestamp })
