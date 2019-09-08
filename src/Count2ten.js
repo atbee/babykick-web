@@ -6,7 +6,7 @@ import moment from 'moment';
 
 const liff = window.liff;
 
-export default class Countctt extends Component {
+export default class Count2ten extends Component {
 
   initialize() {
     liff.init(async () => {
@@ -100,7 +100,7 @@ export default class Countctt extends Component {
 
   componentWillUnmount() {
     if (this.interval) {
-        clearInterval(this.interval);
+        clearInterval(this.interval); 
     }
   }
 
@@ -256,7 +256,7 @@ export default class Countctt extends Component {
             </div>
 
             {/* User enter count page (First time of day) */}
-            <div id="newCount" style={{ display: 'none'}}>
+            <div id="newCount" style={{ display: 'block'}}>
 
               {this.state.line_id}
 
@@ -276,7 +276,7 @@ export default class Countctt extends Component {
             </div>
 
             {/* User comeback to count again. */}
-            <div id="continueCount" style={{ display: 'none'}}>
+            <div id="continueCount" style={{ display: 'block'}}>
 
               {this.state.line_id}
 
