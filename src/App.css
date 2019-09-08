@@ -84,6 +84,12 @@ img {
   font-size: 1.75rem !important;
 }
 
-.Count-ctt {
+.countdown-time{
   font-size: 3rem;
+}
+
+.end-time {
+  margin-top: '5px';
+  font-size: 1rem !important;
+  font-weight: normal !important;
 }

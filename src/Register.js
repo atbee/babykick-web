@@ -30,6 +30,24 @@ export default class Register extends Component {
 
   componentDidMount() {
     window.addEventListener('load', this.initialize);
+
+    axios
+      .post('https://babykick-api.herokuapp.com/verify', this.state)
+      .then(response => {
+        console.log(response)
+        console.log('ไอดีใหม่!')
+      })
+      .catch(error => {
+        console.log(error)
+        console.log('มีไอดีนี้แล้ว!')
+
+        // delay before close
+        setTimeout(()=> {
+          this.setState({ loading : false });
+          liff.closeWindow();
+        }, 1000)
+
+      })
   }
 
   changeHandler = e => {

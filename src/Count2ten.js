@@ -5,6 +5,8 @@ import axios from 'axios';
 import moment from 'moment';
 
 const liff = window.liff;
+//const API = 'https://babykick-api.herokuapp.com';
+const API = 'http://localhost:3001';
 
 export default class Count2ten extends Component {
 
@@ -20,7 +22,7 @@ export default class Count2ten extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      line_id: '',
+      line_id: 'U50240c7e4d230739b2a4343c4a1da542',
       dataUser: [],
       count: 0,
       loading: false,
@@ -45,7 +47,7 @@ export default class Count2ten extends Component {
 
     //checktimer status and send user to new or continue count
     axios
-      .post('https://babykick-api.herokuapp.com/timer/status', this.state)
+      .post(API + '/timer/status', this.state)
       .then(response => {
         console.log(response)
         this.setState({ status : response.data.timer_status})
@@ -76,17 +78,12 @@ export default class Count2ten extends Component {
         const leftTime = moment.utc(moment(endTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format('HH:mm:ss')
 
         //const currentTime_test = moment(currentTime, 'HH:mm:ss').add(11, 'hours').add(59, 'minutes').add(50, 'seconds').format('HH:mm:ss') // Use this to debug
+        
         // if time out
         if(currentTime === endTime) {
           document.getElementById('badEnding').style.display = "block";
           document.getElementById('countPage').style.display = "none";
         }
-
-        // if(moment(then).isSame(countdown, 'second')) {
-        //   document.getElementById('badEnding').style.display = "block";
-        //   document.getElementById('countPage').style.display = "none";
-        //   // liff.closeWindow();
-        // }
 
         await this.setState({ endTime, leftTime, startTime });
     }, 1000);
@@ -98,6 +95,8 @@ export default class Count2ten extends Component {
         clearInterval(this.interval); 
     }
   }
+  // exit code = status_web == 'exit'
+
 
   // handle change in form (UID)
   changeHandler = e => {
@@ -109,7 +108,7 @@ export default class Count2ten extends Component {
     e.preventDefault()
     this.setState({ loading : true });  //set button state to loading (UX)
     axios
-      .post('https://babykick-api.herokuapp.com/timer/counttoten', this.state)
+      .post(API + '/timer/counttoten', this.state)
       .then(response => {
         console.log(response)
         this.setState({ apitime : response.data.time}) // this is start time of count
@@ -135,9 +134,13 @@ export default class Count2ten extends Component {
     const { line_id } = this.state;
     const { dataUser } = this.state;
     axios
-      .post('https://babykick-api.herokuapp.com/ctt/increasing/' + line_id, this.state)
+      .post(API + '/ctt/increasing/' + line_id, this.state)
       .then(response => {
+        console.log(response.data)
+        
         let data_length = response.data.length
+        console.log(data_length)
+
         for (let i = 0; i < data_length; i++) {
           if (i === data_length) {
             console.log(response.data[i - 1])
@@ -149,8 +152,8 @@ export default class Count2ten extends Component {
             })
           }
         }
-        
-        
+        console.log(dataUser)
+
         this.setState({ apitime : dataUser[0].time }) // this is start time of count
         this.setState({ timeTillDate : dataUser[0].timestamp })
         this.setState({ count: dataUser[0].ctt_amount })
@@ -177,7 +180,7 @@ export default class Count2ten extends Component {
     const { line_id } = this.state;
 
     axios
-      .post('https://babykick-api.herokuapp.com/ctt/increasing/' + line_id, this.state)
+      .post(API + '/ctt/increasing/' + line_id, this.state)
       .then(response => {
         console.log(response)
         this.setState({ data: response.data })
@@ -213,7 +216,7 @@ export default class Count2ten extends Component {
     this.setState({ loading : true });  //set button state to loading (UX)
     const { line_id } = this.state;
     axios
-      .post('https://babykick-api.herokuapp.com/ctt/decreasing/' + line_id, this.state)
+      .post(API + '/ctt/decreasing/' + line_id, this.state)
       .then(response => {
         console.log(response)
         this.setState({ data: response.data })
@@ -242,7 +245,7 @@ export default class Count2ten extends Component {
       <div className="App">
         <header className="App-header">
 
-          <div className="form Count-ctt">
+          <div className="form countdown-time">
 
             {/* User already count in this day. */}
             <div id="alreadyCount">
@@ -297,11 +300,15 @@ export default class Count2ten extends Component {
               <Form>
                 <Form.Group>
                   <Form.Label className="">
-
+                    
+                    <div className="countdown-time">
                     {leftTime}
-                    <br/>
-                    สิ้นสุดเวลา🤖 {endTime}
+                    </div>
 
+                    <div className="end-time">
+                    เวลาสิ้นสุด🤖 {endTime}
+                    </div>
+                    
                   </Form.Label>
                 </Form.Group>
 
@@ -310,7 +317,7 @@ export default class Count2ten extends Component {
                 </Button>
 
                 {this.state.count}
-
+                
                 <Button id="incButt" variant="danger" type="submit" className="inc-margin" onClick={this.incHandler} disabled={loading}>
                   {loading ? 'เพิ่ม' : 'เพิ่ม'}
                 </Button>
