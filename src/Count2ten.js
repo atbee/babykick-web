@@ -73,14 +73,9 @@ export default class Count2ten extends Component {
         const startTime = moment(this.state.apitime, 'HH:mm:ss').subtract(0, "hours").format('HH:mm:ss') // Real time of this.state.apitime - 7 hours (Local = minus 7, Server = minus 0)
         const endTime = moment(this.state.apitime, 'HH:mm:ss').add(12, "hours").format('HH:mm:ss') // End time + 5 hours (Local = add 5, Server = add 12)
         
-        console.log(currentTime)
-
         const leftTime = moment.utc(moment(endTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format('HH:mm:ss')
-        console.log(leftTime)
-        //const currentTime_test = moment(currentTime, 'HH:mm:ss').add(11, 'hours').add(59, 'minutes').add(50, 'seconds').format('HH:mm:ss') // test
-        console.log(currentTime, endTime)
 
-        console.log(this.state.apitime)
+        //const currentTime_test = moment(currentTime, 'HH:mm:ss').add(11, 'hours').add(59, 'minutes').add(50, 'seconds').format('HH:mm:ss') // Use this to debug
         // if time out
         if(currentTime === endTime) {
           document.getElementById('badEnding').style.display = "block";
@@ -189,8 +184,7 @@ export default class Count2ten extends Component {
 
         this.setState({ count: this.state.count + 1 })
         this.setState({ loading : false });
-        
-        // test
+      
         if (this.state.count === 0) {
           console.log('COUNT = 0')
           document.getElementById('decButt').disabled = true;
@@ -243,7 +237,7 @@ export default class Count2ten extends Component {
   render() {
     const { line_id } = this.state;
     const { loading } = this.state;
-    const { endTime, leftTime, startTime } = this.state;
+    const { endTime, leftTime} = this.state;
     return (
       <div className="App">
         <header className="App-header">
@@ -258,7 +252,7 @@ export default class Count2ten extends Component {
             {/* User enter count page (First time of day) */}
             <div id="newCount" style={{ display: 'block'}}>
 
-              {this.state.line_id}
+              {/* {this.state.line_id} */}
 
               <Form.Group>
                 <Form.Control
@@ -276,9 +270,9 @@ export default class Count2ten extends Component {
             </div>
 
             {/* User comeback to count again. */}
-            <div id="continueCount" style={{ display: 'block'}}>
+            <div id="continueCount" style={{ display: 'none'}}>
 
-              {this.state.line_id}
+              {/* {this.state.line_id} */}
 
               <Form.Group>
                 <Form.Control
@@ -304,11 +298,9 @@ export default class Count2ten extends Component {
                 <Form.Group>
                   <Form.Label className="">
 
-                    {startTime}
-                    <br/>
                     {leftTime}
                     <br/>
-                    จบ ณ เวลา {endTime}
+                    สิ้นสุดเวลา🤖 {endTime}
 
                   </Form.Label>
                 </Form.Group>
