@@ -11,12 +11,44 @@ const API = 'https://babykick-api.herokuapp.com';
 export default class Count2ten extends Component {
 
   initialize() {
+    this.setState({ loading: true });
     liff.init(async () => {
       let profile = await liff.getProfile();
       this.setState({
         line_id: profile.userId
       });
+      this.verifyUID();
     });
+  }
+
+  verifyUID() {
+    //checktimer status and send user to new or continue count
+    axios
+      .post(API + '/timer/status', this.state)
+      .then(response => {
+        console.log(response)
+        this.setState({ status: response.data.timer_status })
+
+        if (this.state.status === 'timeout') {
+          console.log('state = timeout')
+          document.getElementById('newCount').style.display = "block";
+          document.getElementById('pageisload').style.display = "none";
+          document.getElementById('continueCount').style.display = "none";
+          document.getElementById('extraCount').style.display = "none";
+        } else if (this.state.status === 'running') {
+          console.log('state = running')
+          document.getElementById('newCount').style.display = "none";
+          document.getElementById('pageisload').style.display = "none";
+          document.getElementById('continueCount').style.display = "block";
+          document.getElementById('extraCount').style.display = "none";
+        }
+
+        this.setState({ loading: false });
+
+      })
+      .catch(error => {
+        console.log(error)
+      })
   }
 
   constructor(props) {
@@ -28,81 +60,52 @@ export default class Count2ten extends Component {
       loading: false,
       status: '',
       apitime: '',
-      curtime: '',
-      days: undefined,
-      hours: undefined,
-      minutes: undefined,
-      seconds: undefined,
       timeTillDate: '',
-      timestamp:'',
+      timestamp: '',
       endTime: '',
       leftTime: '',
       startTime: '',
-      status_web: 'exit'
+      status_web: ''
     };
     this.initialize = this.initialize.bind(this);
   }
 
-  componentDidMount = async() => {
+  handleLeavePage(e) {
+    e.preventDefault();
+
+  }
+
+  componentDidMount = async () => {
     window.addEventListener('load', this.initialize);
+    window.addEventListener('beforeunload', this.handleLeavePage);
 
-    //checktimer status and send user to new or continue count
-    axios
-      .post(API + '/timer/status', this.state)
-      .then(response => {
-        console.log(response)
-        this.setState({ status : response.data.timer_status})
+    //get all time data
+    this.interval = setInterval(async () => {
+      const now = moment().unix() * 1000;
+      const currentTime = moment(now).format('HH:mm:ss')
+      const startTime = moment(this.state.apitime, 'HH:mm:ss').subtract(0, "hours").format('HH:mm:ss') // Real time of this.state.apitime - 7 hours (Local = minus 7, Server = minus 0)
+      const endTime = moment(this.state.apitime, 'HH:mm:ss').add(30, "seconds").format('HH:mm:ss') // End time + 5 hours (Local = add 5, Server = add 12)
 
-        if (this.state.status === 'timeout') {
-          console.log('state = timeout')
-          document.getElementById('newCount').style.display = "block";
-          document.getElementById('continueCount').style.display = "none";
-        } else if (this.state.status === 'running') {
-          console.log('state = running')
-          document.getElementById('newCount').style.display = "none";
-          document.getElementById('continueCount').style.display = "block";
-        }
+      const leftTime = moment.utc(moment(endTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format('HH:mm:ss')
 
-      })
-      .catch(error => {
-        console.log(error)
-      })
+      // if time out
+      if (currentTime === endTime) {
+        // document.getElementById('badEnding').style.display = "block";
+        // document.getElementById('countPage').style.display = "none";
+        liff.closeWindow();
+      }
 
-      //get all time data
-      this.interval = setInterval(async() => {
-        const now = moment().unix()*1000;
-        const currentTime = moment(now).format('HH:mm:ss')
-
-        const startTime = moment(this.state.apitime, 'HH:mm:ss').subtract(0, "hours").format('HH:mm:ss') // Real time of this.state.apitime - 7 hours (Local = minus 7, Server = minus 0)
-        const endTime = moment(this.state.apitime, 'HH:mm:ss').add(12, "hours").format('HH:mm:ss') // End time + 5 hours (Local = add 5, Server = add 12)
-        
-        const leftTime = moment.utc(moment(endTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format('HH:mm:ss')
-
-        //const currentTime_test = moment(currentTime, 'HH:mm:ss').add(11, 'hours').add(59, 'minutes').add(50, 'seconds').format('HH:mm:ss') // Use this to debug
-        
-        // if time out
-        if(currentTime === endTime) {
-          document.getElementById('badEnding').style.display = "block";
-          document.getElementById('countPage').style.display = "none";
-        }
-
-        await this.setState({ endTime, leftTime, startTime });
+      this.setState({ endTime, leftTime, startTime });
     }, 1000);
 
   }
 
   componentWillUnmount() {
+    window.removeEventListener('beforeunload', this.handleLeavePage);
+
     if (this.interval) {
-        clearInterval(this.interval); 
+      clearInterval(this.interval);
     }
-    axios
-      .post(API + '/closeweb', this.state)
-      .then(response => {
-        console.log('Web is close')
-      })
-      .catch(error => {
-        console.log(error)
-      })
   }
 
   // handle change in form (UID)
@@ -113,18 +116,18 @@ export default class Count2ten extends Component {
   // Function to begin to count
   beginHandler = e => {
     e.preventDefault()
-    this.setState({ loading : true });  //set button state to loading (UX)
+    this.setState({ loading: true });  //set button state to loading (UX)
     axios
       .post(API + '/timer/counttoten', this.state)
       .then(response => {
         console.log(response)
-        this.setState({ apitime : response.data.time}) // this is start time of count
-        this.setState({ timeTillDate : response.data.timestamp})
+        this.setState({ apitime: response.data.time }) // this is start time of count
+        this.setState({ timeTillDate: response.data.timestamp })
 
         document.getElementById('newCount').style.display = "none";
         document.getElementById('countPage').style.display = "block";
-        this.setState({ loading : false });
-        
+        this.setState({ loading: false });
+
         this.setState.count = 0;
         document.getElementById('decButt').disabled = true;
 
@@ -137,35 +140,30 @@ export default class Count2ten extends Component {
   // Function to continue to count
   continueHandler = e => {
     e.preventDefault()
-    this.setState({ loading : true });  //set button state to loading (UX)
-    const { line_id } = this.state;
+    this.setState({ loading: true });  //set button state to loading (UX)
     const { dataUser } = this.state;
+
     axios
-      .post(API + '/ctt/increasing/' + line_id, this.state)
+      .post(API + '/get/current', this.state)
       .then(response => {
         console.log(response.data)
-        
-        let data_length = Number(response.data.length)
-        for (let i = 0; i < data_length; i++) {
-          if (i === data_length - 1) {
-            let data = response.data[i]
-            dataUser.push({
-              timestamp : data.timestamp,
-              time: data.time,
-              ctt_amount: data.ctt_amount
-            })
-          }
-        }
 
-        this.setState({ apitime : dataUser[0].time }) // this is start time of count
-        this.setState({ timeTillDate : dataUser[0].timestamp })
+        let data = response.data
+        dataUser.push({
+          timestamp: data.timestamp,
+          time: data.time,
+          ctt_amount: data.ctt_amount
+        })
+
+        this.setState({ apitime: dataUser[0].time }) // this is start time of count
+        this.setState({ timeTillDate: dataUser[0].timestamp })
         this.setState({ count: dataUser[0].ctt_amount })
         console.log(this.state.count)
 
         document.getElementById('continueCount').style.display = "none";
         document.getElementById('countPage').style.display = "block";
-        this.setState({ loading : false });
-        
+        this.setState({ loading: false });
+
         this.setState.count = 0;
         document.getElementById('decButt').disabled = true;
 
@@ -179,7 +177,7 @@ export default class Count2ten extends Component {
   incHandler = e => {
     e.preventDefault()
     console.log(this.state)
-    this.setState({ loading : true });  //set button state to loading (UX)
+    this.setState({ loading: true });  //set button state to loading (UX)
     const { line_id } = this.state;
 
     axios
@@ -189,8 +187,8 @@ export default class Count2ten extends Component {
         this.setState({ data: response.data })
 
         this.setState({ count: this.state.count + 1 })
-        this.setState({ loading : false });
-      
+        this.setState({ loading: false });
+
         if (this.state.count === 0) {
           console.log('COUNT = 0')
           document.getElementById('decButt').disabled = true;
@@ -203,7 +201,7 @@ export default class Count2ten extends Component {
           document.getElementById('incButt').disabled = true;
           document.getElementById('goodEnding').style.display = "block";
           document.getElementById('countPage').style.display = "none";
-          // liff.closeWindow();
+          liff.closeWindow();
         }
 
       })
@@ -216,7 +214,7 @@ export default class Count2ten extends Component {
   decHandler = e => {
     e.preventDefault()
     console.log(this.state)
-    this.setState({ loading : true });  //set button state to loading (UX)
+    this.setState({ loading: true });  //set button state to loading (UX)
     const { line_id } = this.state;
     axios
       .post(API + '/ctt/decreasing/' + line_id, this.state)
@@ -224,8 +222,8 @@ export default class Count2ten extends Component {
         console.log(response)
         this.setState({ data: response.data })
         this.setState({ count: this.state.count - 1 })
-        this.setState({ loading : false });
-        
+        this.setState({ loading: false });
+
         // test
         if (this.state.count === 0) {
           console.log('COUNT = 0')
@@ -243,12 +241,16 @@ export default class Count2ten extends Component {
   render() {
     const { line_id } = this.state;
     const { loading } = this.state;
-    const { endTime, leftTime} = this.state;
+    const { endTime, leftTime } = this.state;
     return (
       <div className="App">
         <header className="App-header">
 
           <div className="form countdown-time">
+
+            <div id="pageisload">
+              {loading ? 'กำลังโหลด…' : ''}
+            </div>
 
             {/* User already count in this day. */}
             <div id="alreadyCount">
@@ -256,35 +258,43 @@ export default class Count2ten extends Component {
             </div>
 
             {/* User enter count page (First time of day) */}
-            <div id="newCount" style={{ display: 'block'}}>
+            <div id="newCount" style={{ display: 'none' }}>
 
               {/* {this.state.line_id} */}
+
+              <div className="end-time">
+                นับลูกดิ้นแบบ Count to ten (12ชม.)
+              </div>
 
               <Form.Group>
                 <Form.Control
                   name="line_id"
                   type="text"
-                  placeholder="Line ID" 
+                  placeholder="Line ID"
                   value={line_id}
                   onChange={this.changeHandler} />
               </Form.Group>
 
               <Button variant="danger" type="submit" onClick={this.beginHandler} disabled={loading}>
-                {loading ? 'กำลังโหลด…' : 'เริ่มนับ'}
+                {loading ? 'กำลังโหลด…' : 'เริ่มนับใหม่'}
               </Button>
 
             </div>
 
             {/* User comeback to count again. */}
-            <div id="continueCount" style={{ display: 'none'}}>
+            <div id="continueCount" style={{ display: 'none' }}>
 
               {/* {this.state.line_id} */}
+
+              <div className="end-time">
+                นับลูกดิ้นแบบ Count to ten (12ชม.)
+              </div>
 
               <Form.Group>
                 <Form.Control
                   name="line_id"
                   type="text"
-                  placeholder="Line ID" 
+                  placeholder="Line ID"
                   value={line_id}
                   onChange={this.changeHandler} />
               </Form.Group>
@@ -292,35 +302,39 @@ export default class Count2ten extends Component {
               <Button variant="danger" type="submit" onClick={this.continueHandler} disabled={loading}>
                 {loading ? 'กำลังโหลด…' : 'นับต่อจากเดิม'}
               </Button>
-        
+
             </div>
 
             {/* ---------------------------------------------------------------------------------------------------------------------------- */}
             {/* ---------------------------------------------------------------------------------------------------------------------------- */}
-            
+
             {/* Countpage (obviously...) */}
-            <div id="countPage" style={{ display: 'none'}}>
+            <div id="countPage" style={{ display: 'none' }}>
               <Form>
                 <Form.Group>
                   <Form.Label className="">
-                    
+
+                    <div className="end-time">
+                      นับถอยหลัง (12 ชั่วโมง)
+                    </div>
+
                     <div className="countdown-time">
-                    {leftTime}
+                      {leftTime}
                     </div>
 
                     <div className="end-time">
-                    เวลาสิ้นสุด🤖 {endTime}
+                      เวลาสิ้นสุด <span></span>🤖 {endTime}
                     </div>
-                    
+
                   </Form.Label>
                 </Form.Group>
 
                 <Button id="decButt" variant="danger" type="submit" className="dec-margin" onClick={this.decHandler} disabled={loading}>
-                {loading ? 'ลด' : 'ลด'}
+                  {loading ? 'ลด' : 'ลด'}
                 </Button>
 
                 {this.state.count}
-                
+
                 <Button id="incButt" variant="danger" type="submit" className="inc-margin" onClick={this.incHandler} disabled={loading}>
                   {loading ? 'เพิ่ม' : 'เพิ่ม'}
                 </Button>
@@ -332,17 +346,13 @@ export default class Count2ten extends Component {
             {/* ---------------------------------------------------------------------------------------------------------------------------- */}
 
             {/* finished count (good) */}
-            <div id="goodEnding" style={{ display: 'none'}}>
-              ยินดีด้วยค่ะ 
-              <br></br>
+            <div id="goodEnding" style={{ display: 'none' }}>
               คุณแม่นับครบ 10 ครั้งแล้วค่ะ
             </div>
 
             {/* finished count (bad) */}
-            <div id="badEnding" style={{ display: 'none'}}>
+            <div id="badEnding" style={{ display: 'none' }}>
               คุณแม่นับลูกดิ้นไม่ครบ 10 ครั้งนะคะ
-              <br></br>
-              แนะนำให้ทำการ... ต่อค่ะ
             </div>
 
           </div>

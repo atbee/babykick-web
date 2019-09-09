@@ -73,6 +73,11 @@ img {
   margin-top: 20px;
 }
 
+.reg-success {
+  width: 180px;
+  height: 180px;
+}
+
 /* COUNT PAGE */
 .dec-margin {
   margin-right: 4rem;

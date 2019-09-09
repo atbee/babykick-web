@@ -21,10 +21,6 @@ export default class Count2tenExtra extends Component {
         });
     }
 
-    // initialize() {
-    //     this.verifyUID();
-    // }
-
     verifyUID() {
         //checktimer status and send user to new or continue count
         axios
@@ -76,6 +72,7 @@ export default class Count2tenExtra extends Component {
 
     handleLeavePage(e) {
         e.preventDefault();
+
     }
 
     componentDidMount = async () => {
@@ -121,7 +118,7 @@ export default class Count2tenExtra extends Component {
         e.preventDefault()
         this.setState({ loading: true });  //set button state to loading (UX)
         axios
-            .post(API + '/timer/sadovsky', this.state)
+            .post(API + '/timer/counttoten/second', this.state)
             .then(response => {
                 console.log(response)
                 this.setState({ apitime: response.data.time }) // this is start time of count
@@ -184,7 +181,7 @@ export default class Count2tenExtra extends Component {
         const { line_id } = this.state;
 
         axios
-            .post(API + '/sdk/increasing/' + line_id, this.state)
+            .post(API + '/ctt/increasing/' + line_id, this.state)
             .then(response => {
                 console.log(response)
                 this.setState({ data: response.data })
@@ -199,7 +196,7 @@ export default class Count2tenExtra extends Component {
                     document.getElementById('decButt').disabled = false;
                 }
 
-                if (this.state.count === 3) {
+                if (this.state.count === 10) {
                     console.log('count complete!')
                     document.getElementById('incButt').disabled = true;
                     document.getElementById('goodEnding').style.display = "block";
@@ -220,7 +217,7 @@ export default class Count2tenExtra extends Component {
         this.setState({ loading: true });  //set button state to loading (UX)
         const { line_id } = this.state;
         axios
-            .post(API + '/sdk/decreasing/' + line_id, this.state)
+            .post(API + '/ctt/decreasing/' + line_id, this.state)
             .then(response => {
                 console.log(response)
                 this.setState({ data: response.data })
@@ -266,7 +263,7 @@ export default class Count2tenExtra extends Component {
                             {/* {this.state.line_id} */}
                             
                             <div className="end-time">
-                                นับลูกดิ้นแบบ Sadovsky (3ชม.)
+                                นับลูกดิ้นแบบ Count to ten ต่อ (6ชม.)
                             </div>
 
                             <Form.Group>
@@ -290,7 +287,7 @@ export default class Count2tenExtra extends Component {
                             {/* {this.state.line_id} */}
 
                             <div className="end-time">
-                                นับลูกดิ้นแบบ Sadovsky (3ชม.)
+                                นับลูกดิ้นแบบ Count to ten ต่อ (6ชม.)
                             </div>
 
                             <Form.Group>
@@ -318,7 +315,7 @@ export default class Count2tenExtra extends Component {
                                     <Form.Label className="">
 
                                         <div className="end-time">
-                                            นับถอยหลัง (1 ชั่วโมง)
+                                            นับถอยหลัง (6 ชั่วโมง)
                                         </div>
 
                                         <div className="countdown-time">
@@ -350,12 +347,12 @@ export default class Count2tenExtra extends Component {
 
                         {/* finished count (good) */}
                         <div id="goodEnding" style={{ display: 'none' }}>
-                            คุณแม่นับลูกดิ้นครบ 3 ครั้งแล้วค่ะ
+                            คุณแม่นับครบ 10 ครั้งแล้วค่ะ
                         </div>
 
                         {/* finished count (bad) */}
                         <div id="badEnding" style={{ display: 'none' }}>
-                            คุณแม่นับลูกดิ้นไม่ครบ 3 ครั้งนะคะ
+                            คุณแม่นับลูกดิ้นไม่ครบ 10 ครั้งนะคะ
                         </div>
 
                     </div>

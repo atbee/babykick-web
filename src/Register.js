@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Form, Button} from "react-bootstrap";
-// import Button from 'react-bootstrap-button-loader';
 import './App.css';
 import axios from 'axios';
 
 const liff = window.liff;
+
+const API = 'https://babykick-api.herokuapp.com';
+// const API = 'http://localhost:3001';
 
 export default class Register extends Component {
 
@@ -13,6 +15,7 @@ export default class Register extends Component {
       let profile = await liff.getProfile();
       this.setState({
         line_id: profile.userId
+        // line_id: profile.userId
       });
     });
   }
@@ -32,7 +35,7 @@ export default class Register extends Component {
     window.addEventListener('load', this.initialize);
 
     axios
-      .post('https://babykick-api.herokuapp.com/verify', this.state)
+      .post(API + '/verify', this.state)
       .then(response => {
         console.log(response)
         console.log('ไอดีใหม่!')
@@ -58,7 +61,7 @@ export default class Register extends Component {
     e.preventDefault()
     this.setState({ loading : true });
     axios
-      .post('https://babykick-api.herokuapp.com/register', this.state)
+      .post(API + '/register', this.state)
       .then(response => {
         console.log(response)
         console.log('ลงทะเบียนสำเร็จ!')
@@ -70,7 +73,7 @@ export default class Register extends Component {
         setTimeout(()=> {
           this.setState({ loading : false });
           liff.closeWindow();
-        }, 1000)
+        }, 2500)
       })
       .catch(error => {
         console.log(error)
@@ -83,7 +86,7 @@ export default class Register extends Component {
           this.setState({ loading : false });
           document.getElementById('regisFailed').style.display = "none";
           document.getElementById('regisForm').style.display = "inline";
-        }, 2000)
+        }, 2500)
 
       })
   }
@@ -148,7 +151,7 @@ export default class Register extends Component {
           </div>
 
           <div id="regisSuccess" style={{ display: 'none', marginTop : '50px' }}> 
-          ลงทะเบียนเสร็จเรียบร้อยค่ะ
+          <img src="./register_success.png" alt="reg-success" className="reg-success"></img>
           </div>
 
           <div id="regisFailed" style={{ display: 'none', marginTop : '50px' }}> 
