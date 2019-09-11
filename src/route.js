@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Register from './Register';
 import Count2ten from './Count2ten';
-import Count2tenEx from './Count2tenExtra';
+// import Count2tenEx from './Count2tenExtra';
 import Sadovsky from './Sadovsky';
+import SadovskyEx from './SadovskyExtra';
 
 
 export default class route extends Component {
@@ -14,9 +15,8 @@ export default class route extends Component {
                     {/* <Route exact path="/" component={App}/> */}
                     <Route path="/register" component={Register}/>
                     <Route path="/count2ten" component={Count2ten}/>
-                    <Route path="/count2tenExtra" component={Count2tenEx}/>
                     <Route path="/sadovsky" component={Sadovsky}/>
-
+                    <Route path="/sadovskyExtra" component={SadovskyEx}/>
                 </Switch>
             </Router>
         );

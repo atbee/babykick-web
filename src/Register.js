@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const liff = window.liff;
 
-const API = 'https://babykick-api.herokuapp.com';
+const API = 'https://babykick-api-dev.herokuapp.com';
 // const API = 'http://localhost:3001';
 
 export default class Register extends Component {
@@ -15,7 +15,6 @@ export default class Register extends Component {
       let profile = await liff.getProfile();
       this.setState({
         line_id: profile.userId
-        // line_id: profile.userId
       });
     });
   }
