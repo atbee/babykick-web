@@ -7,9 +7,10 @@ import moment from "moment";
 const liff = window.liff;
 const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
+// const API = "https://29f60334.ngrok.io";
+
 
 export default class SadovskyExtra extends Component {
-  
   initialize() {
     this.setState({ loading: true });
     liff.init(async () => {
@@ -28,18 +29,23 @@ export default class SadovskyExtra extends Component {
   // }
 
   checkToday() {
+    this.setState({ loading: true });
     const { line_id } = this.state;
     axios // check if today is already count
       .post(API + "/check/today/" + line_id, this.state)
       .then(response => {
         console.log(response);
-        console.log("you can count today");
         this.verifyUID(); // go to this function if user hasn't count today
       })
       .catch(error => {
         console.log(error);
-        console.log("TODAY IS ALREADY COUNT!");
-        liff.closeWindow();
+        document.getElementById("pageisload").style.display = "none";
+        document.getElementById("failurePage").style.display = "block";
+        console.log("Couldn't detect UID");
+        setTimeout(() => {
+          this.setState({ loading: false });
+          liff.closeWindow();
+        }, 2000);
       });
   }
 
@@ -50,7 +56,7 @@ export default class SadovskyExtra extends Component {
         console.log(response);
         this.setState({ status: response.data.timer_status });
         this.setState({ sdk_status: response.data.sdk_status });
-
+  
         if (
           this.state.status === "timeout" &&
           this.state.sdk_status === "enable"
@@ -61,21 +67,77 @@ export default class SadovskyExtra extends Component {
           document.getElementById("continueCount").style.display = "none";
         } else if (this.state.status === "running") {
           console.log("state = running");
-          document.getElementById("newCount").style.display = "none";
-          document.getElementById("pageisload").style.display = "none";
-          document.getElementById("continueCount").style.display = "block";
+  
+          const { dataUser } = this.state;
+          axios
+            .post(API + "/get/current", this.state)
+            .then(response => {
+              console.log(response.data);
+  
+              let data = response.data;
+              dataUser.push({
+                timestamp: data.timestamp,
+                time: data.time,
+                sdk_first_meal: data.sdk_first_meal,
+                sdk_second_meal: data.sdk_second_meal,
+                sdk_third_meal: data.sdk_third_meal,
+                status: data.status
+              });
+              
+              this.setState({ count_status: dataUser[0].status });
+              console.log(this.state.count_status)
+  
+              this.setState({ apitime: dataUser[0].time }); // this is start time of count
+              this.setState({ timeTillDate: dataUser[0].timestamp });
+  
+              if (this.state.count_status === '1st') {
+                this.setState({ count: dataUser[0].sdk_first_meal });
+              } else if (this.state.count_status === '2nd') {
+                this.setState({ count: dataUser[0].sdk_second_meal });
+              } else if (this.state.count_status === '3rd') {
+                this.setState({ count: dataUser[0].sdk_third_meal });
+              }
+              
+              console.log(this.state.count);
+  
+              document.getElementById("pageisload").style.display = "none";
+              document.getElementById("continueCount").style.display = "none";
+              document.getElementById("countPage").style.display = "block";
+  
+              setTimeout(() => {
+                this.setState({ loading: false });
+                document.getElementById("countdown-timer").style.display = "block";
+                document.getElementById("countdown-timer-loading").style.display = "none";
+      
+                  if (this.state.count === 0) {
+                    console.log("COUNT = 0");
+                    document.getElementById("decButt").disabled = true;
+                  } else {
+                    document.getElementById("decButt").disabled = false;
+                  }
+              }, 1000);
+            })
+            .catch(error => {
+              console.log(error);
+            });
+  
+          // document.getElementById("newCount").style.display = "none";
+          // document.getElementById("pageisload").style.display = "none";
+          // document.getElementById("continueCount").style.display = "block";
         } else if (
           this.state.status === "timeout" &&
           this.state.sdk_status === "disable"
         ) {
-          const { line_id } = this.state;
+          const { line_id } = this.state; 
           axios // check if user can count only in ctt
             .post(API + "/push/onlyctt/" + line_id, this.state)
             .then(response => {
               console.log(response);
+              liff.closeWindow();
             })
             .catch(error => {
               console.log(error);
+              liff.closeWindow();
             });
         }
         this.setState({ loading: false });
@@ -127,7 +189,7 @@ export default class SadovskyExtra extends Component {
       const now = moment().unix() * 1000;
       const currentTime = moment(now).format("HH:mm:ss");
       const startTime = moment(this.state.apitime, "HH:mm:ss")
-        .subtract(0, "hours")
+        .subtract(7, "hours")
         .format("HH:mm:ss"); // Real time of this.state.apitime - 7 hours (Local = minus 7, Server = minus 0)
       const endTime = moment(this.state.apitime, "HH:mm:ss")
         .add(60, "seconds")
@@ -139,9 +201,13 @@ export default class SadovskyExtra extends Component {
 
       // if time out
       if (currentTime === endTime) {
-        // document.getElementById('badEnding').style.display = "block";
-        // document.getElementById('countPage').style.display = "none";
-        liff.closeWindow();
+        document.getElementById("badEnding").style.display = "block";
+        document.getElementById("countPage").style.display = "none";
+
+        setTimeout(() => {
+          this.setState({ loading: false });
+          liff.closeWindow();
+        }, 2000);
       }
 
       this.setState({ endTime, leftTime, startTime });
@@ -174,52 +240,15 @@ export default class SadovskyExtra extends Component {
         setTimeout(() => {
           this.setState({ loading: false });
           document.getElementById("countdown-timer").style.display = "block";
-          document.getElementById("countdown-timer-loading").style.display =
-            "none";
+          document.getElementById("countdown-timer-loading").style.display = "none";
+
+          if (this.state.count === 0) {
+            console.log("COUNT = 0");
+            document.getElementById("decButt").disabled = true;
+          } else {
+            document.getElementById("decButt").disabled = false;
+          }
         }, 1000);
-
-        this.setState.count = 0;
-        document.getElementById("decButt").disabled = true;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
-  continueHandler = e => {
-    e.preventDefault();
-    this.setState({ loading: true }); //set button state to loading (UX)
-    const { dataUser } = this.state;
-
-    axios
-      .post(API + "/get/current", this.state)
-      .then(response => {
-        console.log(response.data);
-
-        let data = response.data;
-        dataUser.push({
-          timestamp: data.timestamp,
-          time: data.time,
-          ctt_amount: data.ctt_amount
-        });
-
-        this.setState({ apitime: dataUser[0].time }); // this is start time of count
-        this.setState({ timeTillDate: dataUser[0].timestamp });
-        this.setState({ count: dataUser[0].ctt_amount });
-        console.log(this.state.count);
-
-        document.getElementById("continueCount").style.display = "none";
-        document.getElementById("countPage").style.display = "block";
-
-        setTimeout(() => {
-          this.setState({ loading: false });
-          document.getElementById("countdown-timer").style.display = "block";
-          document.getElementById("countdown-timer-loading").style.display =
-            "none";
-        }, 1000);
-
-        this.setState.count = 0;
-        document.getElementById("decButt").disabled = true;
       })
       .catch(error => {
         console.log(error);
@@ -252,12 +281,12 @@ export default class SadovskyExtra extends Component {
           console.log("count complete!");
           document.getElementById("decButt").disabled = true;
           document.getElementById("incButt").disabled = true;
-          // document.getElementById('goodEnding').style.display = "block";
-          // document.getElementById('countPage').style.display = "none";
+          document.getElementById("goodEnding").style.display = "block";
+          document.getElementById("countPage").style.display = "none";
           setTimeout(() => {
             this.setState({ loading: false });
             liff.closeWindow();
-          }, 1000);
+          }, 2000);
         }
       })
       .catch(error => {
@@ -299,14 +328,16 @@ export default class SadovskyExtra extends Component {
       <div className="App">
         <header className="App-header">
           <div className="form count-score">
-            <div id="pageisload">{loading ? "กำลังโหลด…" : ""}</div>
+            <div id="pageisload">
+              <img src="./loading.png" alt="loading" className="loading"></img>
+              {/* {loading ? "กำลังโหลด…" : ""} */}
+            </div>
 
-            {/* User enter count page (First time of day) */}
             <div id="newCount" style={{ display: "none" }}>
               {/* {this.state.line_id} */}
 
               <div className="count-header">
-                นับลูกดิ้นแบบ Sadovsky (นับช่วงเย็นเพิ่ม)
+                นับลูกดิ้นแบบ Sadovsky (นับเพิ่ม)
               </div>
               <div className="end-time">"นับให้ถึง 3 ภายใน 1 ชั่วโมง"</div>
               <div className="end-time">คุณแม่นับลูกดิ้นในเวลา 1 ชั่วโมง</div>
@@ -350,7 +381,7 @@ export default class SadovskyExtra extends Component {
               {/* {this.state.line_id} */}
 
               <div className="count-header">
-                นับลูกดิ้นแบบ Sadovsky (นับต่อจากเดิม)
+                นับลูกดิ้นแบบ Sadovsky (นับต่อ)
               </div>
               <div className="end-time">"นับให้ถึง 3 ภายใน 1 ชั่วโมง"</div>
               <div className="end-time">คุณแม่นับลูกดิ้นในเวลา 1 ชั่วโมง</div>
@@ -398,7 +429,7 @@ export default class SadovskyExtra extends Component {
                 <Form.Group>
                   <Form.Label className="">
                     <div id="countdown-timer" style={{ display: "none" }}>
-                      <div className="end-time">นับถอยหลัง (12 ชั่วโมง)</div>
+                      <div className="end-time">นับถอยหลัง (1 ชั่วโมง)</div>
                       <div className="countdown-time">{leftTime}</div>
                       <div className="end-time">
                         <span role="img" aria-label="time">
@@ -409,13 +440,13 @@ export default class SadovskyExtra extends Component {
                     </div>
 
                     <div id="countdown-timer-loading">
-                      <div className="end-time">นับถอยหลัง (12 ชั่วโมง)</div>
-                      <div className="countdown-time">กำลังโหลด...</div>
+                      <div className="end-time">นับถอยหลัง (1 ชั่วโมง)</div>
+                      <div className="countdown-time">คำนวนเวลา...</div>
                       <div className="end-time">
                         <span role="img" aria-label="time">
                           เวลาสิ้นสุด 🤖
                         </span>{" "}
-                        กำลังโหลด...
+                        คำนวนเวลา...
                       </div>
                     </div>
                   </Form.Label>
@@ -449,12 +480,12 @@ export default class SadovskyExtra extends Component {
 
             {/* finished count (good) */}
             <div id="goodEnding" style={{ display: "none" }}>
-              คุณแม่นับลูกดิ้นครบ 3 ครั้งแล้วค่ะ
+              <img src="./good.png" alt="good" className="good"></img>
             </div>
 
             {/* finished count (bad) */}
             <div id="badEnding" style={{ display: "none" }}>
-              คุณแม่นับลูกดิ้นไม่ครบ 3 ครั้งนะคะ
+              <img src="./bad.png" alt="bad" className="bad"></img>
             </div>
           </div>
         </header>

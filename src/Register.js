@@ -7,6 +7,8 @@ const liff = window.liff;
 
 const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
+// const API = "https://29f60334.ngrok.io";
+
 
 export default class Register extends Component {
   initialize() {
@@ -73,7 +75,7 @@ export default class Register extends Component {
         setTimeout(() => {
           this.setState({ loading: false });
           liff.closeWindow();
-        }, 2500);
+        }, 2000);
       })
       .catch(error => {
         console.log(error);
@@ -86,7 +88,7 @@ export default class Register extends Component {
           this.setState({ loading: false });
           document.getElementById("regisFailed").style.display = "none";
           document.getElementById("regisForm").style.display = "inline";
-        }, 2500);
+        }, 2000);
       });
   };
 
@@ -96,11 +98,11 @@ export default class Register extends Component {
       <div className="App">
         <header className="App-header">
           <div id="pageisload">
-            <img
-              src="./register_success.png"
-              alt="reg-success"
-              className="reg-success"
-            ></img>
+              <img
+                src="./loading.png"
+                alt="loading"
+                className="loading"
+              ></img>
             {/* {loading ? "กำลังโหลด…" : "กำลังโหลด..."} */}
           </div>
           <div id="regisForm" className="form" style={{display:'none'}}>

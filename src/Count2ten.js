@@ -7,9 +7,9 @@ import moment from "moment";
 const liff = window.liff;
 const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
+// const API = "https://29f60334.ngrok.io";
 
 export default class Count2ten extends Component {
-
   initialize() {
     this.setState({ loading: true });
     liff.init(async () => {
@@ -28,18 +28,23 @@ export default class Count2ten extends Component {
   // }
 
   checkToday() {
+    this.setState({ loading: true });
     const { line_id } = this.state;
     axios // check if today is already count
       .post(API + "/check/today/" + line_id, this.state)
       .then(response => {
         console.log(response);
-        console.log("you can count today");
         this.verifyUID(); // go to this function if user hasn't count today
       })
       .catch(error => {
         console.log(error);
-        console.log("TODAY IS ALREADY COUNT!");
-        liff.closeWindow();
+        document.getElementById("pageisload").style.display = "none";
+        document.getElementById("failurePage").style.display = "block";
+        console.log("Couldn't detect UID");
+        setTimeout(() => {
+          this.setState({ loading: false });
+          liff.closeWindow();
+        }, 2000);
       });
   }
 
@@ -57,11 +62,50 @@ export default class Count2ten extends Component {
           document.getElementById("continueCount").style.display = "none";
         } else if (this.state.status === "running") {
           console.log("state = running");
-          document.getElementById("newCount").style.display = "none";
-          document.getElementById("pageisload").style.display = "none";
-          document.getElementById("continueCount").style.display = "block";
-        }
+          
+          const { dataUser } = this.state;
+          axios
+            .post(API + "/get/current", this.state)
+            .then(response => {
+              console.log(response.data);
 
+              let data = response.data;
+              dataUser.push({
+                timestamp: data.timestamp,
+                time: data.time,
+                ctt_amount: data.ctt_amount
+              });
+
+              this.setState({ apitime: dataUser[0].time }); // this is start time of count
+              this.setState({ timeTillDate: dataUser[0].timestamp });
+              this.setState({ count: dataUser[0].ctt_amount });
+              console.log(this.state.count);
+
+              document.getElementById("pageisload").style.display = "none";
+              document.getElementById("continueCount").style.display = "none";
+              document.getElementById("countPage").style.display = "block";
+
+              setTimeout(() => {  // this is a time out for loading time (UX)
+                this.setState({ loading: false });
+                document.getElementById("countdown-timer").style.display = "block";
+                document.getElementById("countdown-timer-loading").style.display = "none";
+      
+                  if (this.state.count === 0) {
+                    console.log("COUNT = 0");
+                    document.getElementById("decButt").disabled = true;
+                  } else {
+                    document.getElementById("decButt").disabled = false;
+                  }
+              }, 1000);
+            })
+            .catch(error => {
+              console.log(error);
+            });
+
+          // document.getElementById("newCount").style.display = "none";
+          // document.getElementById("pageisload").style.display = "none";
+          // document.getElementById("continueCount").style.display = "block";
+        }
         this.setState({ loading: false });
       })
       .catch(error => {
@@ -104,7 +148,9 @@ export default class Count2ten extends Component {
 
   componentDidMount = async () => {
     window.addEventListener("load", this.initialize);
-    document.title = "Count to ten"
+    document.title = "Count to ten";
+
+    this.setState({ loading: true }); //set button state to loading (UX)
 
     //get all time data
     this.interval = setInterval(async () => {
@@ -123,9 +169,12 @@ export default class Count2ten extends Component {
 
       // if time out
       if (currentTime === endTime) {
-        // document.getElementById('badEnding').style.display = "block";
-        // document.getElementById('countPage').style.display = "none";
-        liff.closeWindow();
+        document.getElementById("badEnding").style.display = "block";
+        document.getElementById("countPage").style.display = "none";
+        setTimeout(() => {
+          this.setState({ loading: false });
+          liff.closeWindow();
+        }, 2000);
       }
 
       this.setState({ endTime, leftTime, startTime });
@@ -159,10 +208,14 @@ export default class Count2ten extends Component {
           this.setState({ loading: false });
           document.getElementById("countdown-timer").style.display = "block";
           document.getElementById("countdown-timer-loading").style.display = "none";
-        }, 1000);
 
-        this.setState.count = 0;
-        document.getElementById("decButt").disabled = true;
+            if (this.state.count === 0) {
+              console.log("COUNT = 0");
+              document.getElementById("decButt").disabled = true;
+            } else {
+              document.getElementById("decButt").disabled = false;
+            }
+        }, 1000);
       })
       .catch(error => {
         console.log(error);
@@ -172,13 +225,12 @@ export default class Count2ten extends Component {
   continueHandler = e => {
     e.preventDefault();
     this.setState({ loading: true }); //set button state to loading (UX)
-    const { dataUser } = this.state;
 
+    const { dataUser } = this.state;
     axios
       .post(API + "/get/current", this.state)
       .then(response => {
         console.log(response.data);
-
         let data = response.data;
         dataUser.push({
           timestamp: data.timestamp,
@@ -197,7 +249,8 @@ export default class Count2ten extends Component {
         setTimeout(() => {
           this.setState({ loading: false });
           document.getElementById("countdown-timer").style.display = "block";
-          document.getElementById("countdown-timer-loading").style.display = "none";
+          document.getElementById("countdown-timer-loading").style.display =
+            "none";
         }, 1000);
 
         this.setState.count = 0;
@@ -219,6 +272,7 @@ export default class Count2ten extends Component {
       .then(response => {
         console.log(response);
         this.setState({ data: response.data });
+        
 
         this.setState({ count: this.state.count + 1 });
         this.setState({ loading: false });
@@ -234,12 +288,12 @@ export default class Count2ten extends Component {
           console.log("count complete!");
           document.getElementById("incButt").disabled = true;
           document.getElementById("decButt").disabled = true;
-          // document.getElementById('goodEnding').style.display = "block";
-          // document.getElementById('countPage').style.display = "none";
+          document.getElementById("goodEnding").style.display = "block";
+          document.getElementById("countPage").style.display = "none";
           setTimeout(() => {
             this.setState({ loading: false });
             liff.closeWindow();
-          }, 1000);
+          }, 2000);
         }
       })
       .catch(error => {
@@ -282,19 +336,13 @@ export default class Count2ten extends Component {
         <header className="App-header">
           <div className="form count-score">
             <div id="pageisload">
-              <img
-                src="./register_success.png"
-                alt="reg-success"
-                className="reg-success"
-              ></img>
+              <img src="./loading.png" alt="loading" className="loading"></img>
               {/* {loading ? "กำลังโหลด…" : ""} */}
             </div>
 
             {/* User enter count page (First time of day) */}
             <div id="newCount" style={{ display: "none" }}>
-              <div className="count-header">
-                นับลูกดิ้นแบบ Count to ten (นับใหม่)
-              </div>
+              <div className="count-header">นับแบบ Count to ten (นับใหม่)</div>
               <div className="end-time">"นับให้ถึง 10 ภายใน 12 ชั่วโมง"</div>
               <div className="end-time">คุณแม่สามารถนับลูกดิ้นเวลาใดก็ได้</div>
               <div className="end-time">โดยหลังจากเริ่มนับ</div>
@@ -320,21 +368,21 @@ export default class Count2ten extends Component {
                 onClick={this.beginHandler}
                 disabled={loading}
               >
-                {loading && <Spinner
-                  as="span"
-                  animation="border"
-                  size="lg"
-                  role="status"
-                />}
+                {loading && (
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="lg"
+                    role="status"
+                  />
+                )}
                 {!loading && "เริ่ม"}
               </Button>
             </div>
 
             {/* User comeback to count again. */}
             <div id="continueCount" style={{ display: "none" }}>
-              <div className="count-header">
-                นับลูกดิ้นแบบ Count to ten (นับต่อ)
-              </div>
+              <div className="count-header">นับแบบ Count to ten (นับต่อ)</div>
               <div className="end-time">"นับให้ถึง 10 ภายใน 12 ชั่วโมง"</div>
               <div className="end-time">คุณแม่สามารถนับลูกดิ้นเวลาใดก็ได้</div>
               <div className="end-time">โดยหลังจากเริ่มนับ</div>
@@ -360,15 +408,16 @@ export default class Count2ten extends Component {
                 onClick={this.continueHandler}
                 disabled={loading}
               >
-                {loading && <Spinner
-                  as="span"
-                  animation="border"
-                  size="lg"
-                  role="status"
-                />}
+                {loading && (
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="lg"
+                    role="status"
+                  />
+                )}
                 {!loading && "ต่อ"}
               </Button>
-
             </div>
 
             {/* ---------------------------------------------------------------------------------------------------------------------------- */}
@@ -392,12 +441,12 @@ export default class Count2ten extends Component {
 
                     <div id="countdown-timer-loading">
                       <div className="end-time">นับถอยหลัง (12 ชั่วโมง)</div>
-                      <div className="countdown-time">กำลังโหลด...</div>
+                      <div className="countdown-time">คำนวนเวลา...</div>
                       <div className="end-time">
                         <span role="img" aria-label="time">
                           เวลาสิ้นสุด 🤖
                         </span>{" "}
-                        กำลังโหลด...
+                        คำนวนเวลา...
                       </div>
                     </div>
                   </Form.Label>
@@ -432,7 +481,7 @@ export default class Count2ten extends Component {
                     onClick={this.handleLeavePage}
                     disabled={loading}
                   >
-                    {loading ? "ออก" : "ออก"}
+                    {loading ? "พักหน้าจอ" : "พักหน้าจอ"}
                   </Button>
                 </div>
               </Form>
@@ -443,12 +492,16 @@ export default class Count2ten extends Component {
 
             {/* finished count (good) */}
             <div id="goodEnding" style={{ display: "none" }}>
-              คุณแม่นับครบ 10 ครั้งแล้วค่ะ
+              <img src="./good.png" alt="good" className="good"></img>
             </div>
 
             {/* finished count (bad) */}
             <div id="badEnding" style={{ display: "none" }}>
-              คุณแม่นับลูกดิ้นไม่ครบ 10 ครั้งนะคะ
+              <img src="./bad.png" alt="bad" className="bad"></img>
+            </div>
+
+            <div id="failurePage" style={{ display: "none" }}>
+              <img src="./failure.png" alt="failed" className="failed"></img>
             </div>
           </div>
         </header>
