@@ -1,12 +1,19 @@
-FROM node:9.11
+FROM node:12.10.0-alpine as build-stage
 
-RUN mkdir /usr/src/app
-WORKDIR /usr/src/app
+RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
-ENV PATH /usr/src/app/node_modules/.bin:$PATH
+WORKDIR /home/node/app
 
-COPY package.json /usr/src/app/package.json
+ENV PATH /home/node/app/node_modules/.bin:$PATH
+
+COPY package*.json ./
+
 RUN npm install
+
 RUN npm install react-scripts -g
+
+COPY --chown=node:node . .
+
+EXPOSE 3000
 
 CMD ["npm", "start"]
