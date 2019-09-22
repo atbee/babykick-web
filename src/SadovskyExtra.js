@@ -7,7 +7,6 @@ import moment from "moment";
 const liff = window.liff;
 const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
-// const API = "https://29f60334.ngrok.io";
 
 
 export default class SadovskyExtra extends Component {
@@ -184,8 +183,7 @@ export default class SadovskyExtra extends Component {
     window.addEventListener("load", this.initialize);
     document.title = "Sadovsky (Extra)";
 
-    //get all time data
-    this.interval = setInterval(async () => {
+    this.interval = setInterval(async () => { //get all time data
       const now = moment().unix() * 1000;
       const currentTime = moment(now).format("HH:mm:ss");
       const startTime = moment(this.state.apitime, "HH:mm:ss")
@@ -198,9 +196,8 @@ export default class SadovskyExtra extends Component {
       const leftTime = moment
         .utc(moment(endTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss")))
         .format("HH:mm:ss");
-
-      // if time out
-      if (currentTime === endTime) {
+      
+      if (currentTime === endTime) {  // if time out
         document.getElementById("badEnding").style.display = "block";
         document.getElementById("countPage").style.display = "none";
 
@@ -329,7 +326,7 @@ export default class SadovskyExtra extends Component {
         <header className="App-header">
           <div className="form count-score">
             <div id="pageisload">
-              <img src="./loading.png" alt="loading" className="loading"></img>
+              <img src="./loading.gif" alt="loading" className="loading"></img>
               {/* {loading ? "กำลังโหลด…" : ""} */}
             </div>
 
@@ -480,7 +477,7 @@ export default class SadovskyExtra extends Component {
 
             {/* finished count (good) */}
             <div id="goodEnding" style={{ display: "none" }}>
-              <img src="./good.png" alt="good" className="good"></img>
+              <img src="./good_count.png" alt="good" className="good"></img>
             </div>
 
             {/* finished count (bad) */}

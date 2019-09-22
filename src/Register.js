@@ -7,7 +7,6 @@ const liff = window.liff;
 
 const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
-// const API = "https://29f60334.ngrok.io";
 
 
 export default class Register extends Component {
@@ -99,7 +98,7 @@ export default class Register extends Component {
         <header className="App-header">
           <div id="pageisload">
               <img
-                src="./loading.png"
+                src="./loading.gif"
                 alt="loading"
                 className="loading"
               ></img>
