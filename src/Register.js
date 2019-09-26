@@ -152,16 +152,20 @@ export default class Register extends Component {
             </Form>
           </div>
 
-          <div id="regisSuccess" style={{ display: "none", marginTop: "50px" }}>
+          <div id="regisSuccess" style={{ display: "none"}}>
             <img
               src="./register_success.png"
-              alt="reg-success"
-              className="reg-success"
+              alt="reg"
+              className="reg"
             ></img>
           </div>
 
-          <div id="regisFailed" style={{ display: "none", marginTop: "50px" }}>
-            ลงทะเบียนไม่สำเร็จ!
+          <div id="regisFailed" style={{ display: "none"}}>
+            <img
+              src="./register_success.png"
+              alt="reg"
+              className="reg"
+            ></img>
           </div>
         </header>
       </div>

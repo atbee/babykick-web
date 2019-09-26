@@ -9,22 +9,22 @@ const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
 
 export default class Sadovsky extends Component {
-  // initialize() {
-  //   this.setState({ loading: true });
-  //   liff.init(async () => {
-  //     let profile = await liff.getProfile();
-  //     this.setState({
-  //       line_id: profile.userId
-  //     });
-  //     this.checkToday();
-  //     // this.verifyUID();
-  //   });
-  // }
-
   initialize() {
-    // this.checkToday();
-    this.verifyUID();
+    this.setState({ loading: true });
+    liff.init(async () => {
+      let profile = await liff.getProfile();
+      this.setState({
+        line_id: profile.userId
+      });
+      // this.checkToday();
+      this.verifyUID();
+    });
   }
+
+  // initialize() {
+  //   // this.checkToday();
+  //   this.verifyUID();
+  // }
 
   checkToday() {
     this.setState({ loading: true });
@@ -46,12 +46,12 @@ export default class Sadovsky extends Component {
             .post(API + "/check/sdk/" + line_id, this.state)
             .then(response => {
               console.log(response);
-              console.log("you can count sdk at this moment");
+              console.log("you can count sdk at this time period");
               this.verifyUID(); // go to this function if user hasn't count today
             })
             .catch(error => {
               console.log(error);
-              console.log("you can not count sdk at this moment");
+              console.log("you can not count sdk at this time period");
               liff.closeWindow();
             });
         }
@@ -64,27 +64,32 @@ export default class Sadovsky extends Component {
   }
 
   verifyUID() {
-    axios //checktimer status and send user to new or continue count
+    axios //checktimer status and send user to count
       .post(API + "/timer/status", this.state)
       .then(response => {
         console.log(response);
-        this.setState({ status: response.data.timer_status });
-        this.setState({ sdk_status: response.data.sdk_status });
-        this.setState({ countType: response.data.count_type });
+        this.setState({
+          status: response.data.timer_status,
+          sdk_status: response.data.sdk_status,
+          countType: response.data.count_type
+        });
 
-        if (this.state.status === "timeout" && this.state.sdk_status === "enable") {
+        if (
+          this.state.status === "timeout" &&
+          this.state.sdk_status === "enable"
+        ) {
           document.getElementById("newCount").style.display = "block";
           document.getElementById("pageisload").style.display = "none";
-          document.getElementById("continueCount").style.display = "none";
-        } else if (this.state.status === "running" && this.state.countType === "sdk") {
+        } else if (
+          this.state.status === "running" &&
+          this.state.countType === "sdk"
+        ) {
           console.log("User still in sdk");
 
           const { dataUser } = this.state;
           axios
             .post(API + "/get/current", this.state)
             .then(response => {
-              console.log(response.data);
-
               let data = response.data;
               dataUser.push({
                 timestamp: data.timestamp,
@@ -93,14 +98,18 @@ export default class Sadovsky extends Component {
                 sdk_second_meal: data.sdk_second_meal,
                 sdk_third_meal: data.sdk_third_meal,
                 sdk_all_meal: data.sdk_all_meal,
+                sdk_extra_meal: data.sdk_extra_meal,
                 status: data.status
               });
 
-              this.setState({ count_status: dataUser[0].status });
-              console.log(this.state.count_status);
+              this.setState({
+                countAll: dataUser[0].sdk_all_meal,
+                count_status: dataUser[0].status,
+                apitime: dataUser[0].time,
+                timeTillDate: dataUser[0].timestamp
+              });
 
-              this.setState({ apitime: dataUser[0].time }); // this is start time of count
-              this.setState({ timeTillDate: dataUser[0].timestamp });
+              console.log("SDK_all_meal value = " + this.state.countAll);
 
               if (this.state.count_status === "1st") {
                 this.setState({ count: dataUser[0].sdk_first_meal });
@@ -108,12 +117,11 @@ export default class Sadovsky extends Component {
                 this.setState({ count: dataUser[0].sdk_second_meal });
               } else if (this.state.count_status === "3rd") {
                 this.setState({ count: dataUser[0].sdk_third_meal });
+              } else if (this.state.count_status === "extra") {
+                this.setState({ count: dataUser[0].sdk_extra_meal });
               }
 
-              console.log(this.state.count);
-
               document.getElementById("pageisload").style.display = "none";
-              document.getElementById("continueCount").style.display = "none";
               document.getElementById("countPage").style.display = "block";
 
               setTimeout(() => {
@@ -135,7 +143,6 @@ export default class Sadovsky extends Component {
             .catch(error => {
               console.log(error);
             });
-
         } else if (
           this.state.status === "timeout" &&
           this.state.sdk_status === "disable"
@@ -151,17 +158,20 @@ export default class Sadovsky extends Component {
               console.log(error);
               liff.closeWindow();
             });
-        } else if (this.state.status === "running" && this.state.countType === "ctt") {
+        } else if (
+          this.state.status === "running" &&
+          this.state.countType === "ctt"
+        ) {
           console.log("User still in ctt!");
           axios
-          .post(API + "/check/btn/", this.state)
-          .then(response => {
-            console.log(response);
-            liff.closeWindow();
-          })
-          .catch(error => {
-            console.log(error);
-          });
+            .post(API + "/check/btn/", this.state)
+            .then(response => {
+              console.log(response);
+              liff.closeWindow();
+            })
+            .catch(error => {
+              console.log(error);
+            });
         }
         this.setState({ loading: false });
       })
@@ -174,8 +184,8 @@ export default class Sadovsky extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      line_id: "U50240c7e4d230739b2a4343c4a1da542",
-      // line_id: "",
+      // line_id: "U50240c7e4d230739b2a4343c4a1da542",
+      line_id: "",
       dataUser: [],
       count: 0,
       countAll: 0,
@@ -219,6 +229,7 @@ export default class Sadovsky extends Component {
       const startTime = moment(this.state.apitime, "HH:mm:ss")
         .subtract(7, "hours")
         .format("HH:mm:ss"); // Real time of this.state.apitime - 7 hours (Local = minus 7, Server = minus 0)
+
       const endTime = moment(this.state.apitime, "HH:mm:ss")
         .add(60, "seconds")
         .format("HH:mm:ss"); // End time + 5 hours (Local = add 5, Server = add 12)
@@ -242,15 +253,18 @@ export default class Sadovsky extends Component {
           this.setState({ loading: false });
           liff.closeWindow();
         }, 2000);
-      } 
-      // else if (currentTime === endTime && this.state.count < 3 && this.state.count_status === "3rd") {
-      //   document.getElementById("badEnding").style.display = "block";
-      //   document.getElementById("countPage").style.display = "none";
-      //   setTimeout(() => {
-      //     this.setState({ loading: false });
-      //     liff.closeWindow();
-      //   }, 2000);
-      // } 
+      } else if (
+        currentTime === endTime &&
+        this.state.count < 3 &&
+        this.state.count_status === "3rd"
+      ) {
+        document.getElementById("badEnding").style.display = "block";
+        document.getElementById("countPage").style.display = "none";
+        setTimeout(() => {
+          this.setState({ loading: false });
+          liff.closeWindow();
+        }, 2000);
+      }
 
       this.setState({ endTime, leftTime, startTime });
     }, 1000);
@@ -276,6 +290,23 @@ export default class Sadovsky extends Component {
         this.setState({ apitime: response.data.time }); // this is start time of count
         this.setState({ timeTillDate: response.data.timestamp });
 
+        const { dataUser } = this.state;
+        axios
+          .post(API + "/get/current", this.state)
+          .then(response => {
+            let data = response.data;
+            dataUser.push({
+              sdk_all_meal: data.sdk_all_meal,
+              status: data.status
+            });
+            this.setState({ countAll: dataUser[0].sdk_all_meal });
+            this.setState({ count_status: dataUser[0].status });
+            console.log("SDK_all_meal value = " + this.state.countAll);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+
         document.getElementById("newCount").style.display = "none";
         document.getElementById("countPage").style.display = "block";
 
@@ -287,7 +318,6 @@ export default class Sadovsky extends Component {
             "none";
 
           if (this.state.count === 0) {
-            console.log("COUNT = 0");
             document.getElementById("decButt").disabled = true;
           } else {
             document.getElementById("decButt").disabled = false;
@@ -299,49 +329,8 @@ export default class Sadovsky extends Component {
       });
   };
 
-  continueHandler = e => {
-    e.preventDefault();
-    this.setState({ loading: true }); //set button state to loading (UX)
-
-    const { dataUser } = this.state;
-    axios
-      .post(API + "/get/current", this.state)
-      .then(response => {
-        console.log(response.data);
-
-        let data = response.data;
-        dataUser.push({
-          timestamp: data.timestamp,
-          time: data.time,
-          ctt_amount: data.ctt_amount
-        });
-
-        this.setState({ apitime: dataUser[0].time }); // this is start time of count
-        this.setState({ timeTillDate: dataUser[0].timestamp });
-        this.setState({ count: dataUser[0].sdk_first_meal });
-        console.log(this.state.count);
-
-        document.getElementById("continueCount").style.display = "none";
-        document.getElementById("countPage").style.display = "block";
-
-        setTimeout(() => {
-          this.setState({ loading: false });
-          document.getElementById("countdown-timer").style.display = "block";
-          document.getElementById("countdown-timer-loading").style.display =
-            "none";
-        }, 1000);
-
-        this.setState.count = 0;
-        document.getElementById("decButt").disabled = true;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
   incHandler = e => {
     e.preventDefault();
-    console.log(this.state);
     this.setState({ loading: true }); //set button state to loading (UX)
     const { line_id } = this.state;
 
@@ -350,18 +339,40 @@ export default class Sadovsky extends Component {
       .then(response => {
         console.log(response);
         this.setState({ data: response.data });
-
-        this.setState({ count: this.state.count + 1 });
         this.setState({ loading: false });
 
+        this.setState({ count: this.state.count + 1 });
+        this.setState({ countAll: this.state.countAll + 1 });
+        console.log("All time count = " + this.state.countAll);
+
         if (this.state.count === 3) {
-          console.log('count = 3');
           document.getElementById("finishcount").style.display = "block";
           document.getElementById("goalcount").style.display = "none";
         }
-        
+
+        if (this.state.count === 3 && this.state.count_status === "3rd") {
+          document.getElementById("decButt").disabled = true;
+          document.getElementById("incButt").disabled = true;
+          document.getElementById("goodEnding").style.display = "block";
+          document.getElementById("countPage").style.display = "none";
+          setTimeout(() => {
+            this.setState({ loading: false });
+            liff.closeWindow();
+          }, 2000);
+        }
+
         if (this.state.count === 10) {
-          console.log("count complete! (10/10)");
+          document.getElementById("decButt").disabled = true;
+          document.getElementById("incButt").disabled = true;
+          document.getElementById("goodEnding").style.display = "block";
+          document.getElementById("countPage").style.display = "none";
+          setTimeout(() => {
+            this.setState({ loading: false });
+            liff.closeWindow();
+          }, 2000);
+        }
+
+        if (this.state.countAll > 9 && this.state.count_status === "3rd") {
           document.getElementById("decButt").disabled = true;
           document.getElementById("incButt").disabled = true;
           document.getElementById("goodEnding").style.display = "block";
@@ -379,7 +390,6 @@ export default class Sadovsky extends Component {
 
   decHandler = e => {
     e.preventDefault();
-    console.log(this.state);
     this.setState({ loading: true }); //set button state to loading (UX)
     const { line_id } = this.state;
     axios
@@ -387,16 +397,19 @@ export default class Sadovsky extends Component {
       .then(response => {
         console.log(response);
         this.setState({ data: response.data });
-        this.setState({ count: this.state.count - 1 });
         this.setState({ loading: false });
 
+        this.setState({ count: this.state.count - 1 });
+        this.setState({ countAll: this.state.countAll - 1 });
+        console.log("All time count = " + this.state.countAll);
+
         if (this.state.count === 0) {
-          console.log("COUNT = 0");
+          console.log("Count is zero: lock decrease button");
           document.getElementById("decButt").disabled = true;
         } else {
           document.getElementById("decButt").disabled = false;
         }
-        
+
         if (this.state.count < 3) {
           document.getElementById("finishcount").style.display = "none";
           document.getElementById("goalcount").style.display = "block";
@@ -421,11 +434,17 @@ export default class Sadovsky extends Component {
             </div>
 
             <div id="newCount" style={{ display: "none" }}>
-              <div className="count-header">นับแบบ Sadovsky (เริ่มนับ)</div>
+              <div className="count-header">การนับแบบ Sadovsky</div>
               <div className="end-time">การนับลูกดิ้นแบบ Sadovsky คือ</div>
-              <div className="end-time">การนับให้ถึง 3 ครั้ง ภายในเวลา 1 ชั่วโมง</div>
-              <div className="end-time">หลังมื้ออาหาร 3 มื้อ (เช้า เที่ยง เย็น)</div>
-              <div className="end-time">โดยในแต่ละมื้อต้องนับให้ได้ 3 ครั้งขึ้นไป</div>  
+              <div className="end-time">
+                การนับให้ถึง 3 ครั้ง ภายในเวลา 1 ชั่วโมง
+              </div>
+              <div className="end-time">
+                หลังมื้ออาหาร 3 มื้อ (เช้า เที่ยง เย็น)
+              </div>
+              <div className="end-time">
+                โดยในแต่ละมื้อต้องนับให้ได้ 3 ครั้งขึ้นไป
+              </div>
 
               <Form.Group>
                 <Form.Control
@@ -457,51 +476,13 @@ export default class Sadovsky extends Component {
               </Button>
             </div>
 
-            {/* User comeback to count again. */}
-            <div id="continueCount" style={{ display: "none" }}>
-              <div className="count-header">นับแบบ Sadovsky (นับต่อ)</div>
-              <div className="end-time">"นับให้ถึง 3 ภายใน 1 ชั่วโมง"</div>
-              <div className="end-time">คุณแม่นับลูกดิ้นในเวลา 1 ชั่วโมง</div>
-              <div className="end-time">หลังอาหาร 3 เวลา</div>
-              <div className="end-time">โดยในแต่ละครั้งต้องนับให้ได้ ​3 ครั้งขึ้นไป</div>
-
-              <Form.Group>
-                <Form.Control
-                  className="hide"
-                  name="line_id"
-                  type="text"
-                  placeholder="Line ID"
-                  value={line_id}
-                  onChange={this.changeHandler}
-                />
-              </Form.Group>
-
-              <Button
-                className="count-btn"
-                variant="danger"
-                type="submit"
-                onClick={this.continueHandler}
-                disabled={loading}
-              >
-                {loading && (
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="lg"
-                    role="status"
-                  />
-                )}
-                {!loading && "ต่อ"}
-              </Button>
-            </div>
-
             {/* ---------------------------------------------------------------------------------------------------------------------------- */}
             {/* ---------------------------------------------------------------------------------------------------------------------------- */}
 
             {/* Countpage (obviously...) */}
             <div id="countPage" style={{ display: "none" }}>
               <Form>
-                <Form.Group>
+                <Form.Group className="time-form">
                   <Form.Label className="">
                     <div id="countdown-timer" style={{ display: "none" }}>
                       <div className="end-time">นับถอยหลัง (1 ชั่วโมง)</div>
@@ -548,13 +529,21 @@ export default class Sadovsky extends Component {
                   {loading ? "เพิ่ม" : "เพิ่ม"}
                 </Button>
                 <br></br>
-                <div id="goalcount" className="end-time" style={{display:'block'}}>
+                <div
+                  id="goalcount"
+                  className="end-time sadov-count"
+                  style={{ display: "block" }}
+                >
                   <span role="img" aria-label="time">
                     เป้าหมายการนับครั้งนี้คือ
                   </span>{" "}
                   3 ครั้ง
                 </div>
-                <div id="finishcount" className="end-time" style={{display:'none'}}>
+                <div
+                  id="finishcount"
+                  className="end-time sadov-count"
+                  style={{ display: "none" }}
+                >
                   <span role="img" aria-label="time">
                     คุณแม่นับครบ
                   </span>{" "}

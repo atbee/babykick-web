@@ -68,21 +68,37 @@ button {
   border-color: #db5e88 !important;
 }
 
+.time-form
+{
+  margin-bottom: 0 !important;
+}
+
 img {
   height: 120px;
   margin-top: 20px;
 }
 
-.reg-success {
-  width: 180px;
-  height: 180px;
+.reg {
+  height: 13rem;
 }
 
 .loading{
-  /* width: 500px; */
   margin-top: 50px;
   height: 100px;
 }
+
+.good {
+  height: 13rem;
+}
+
+.bad {
+  height: 13rem;
+}
+
+.sadov-count{
+  margin-top: 1rem;
+}
+
 /* COUNT PAGE */
 .count-btn {
   font-size: 1.75rem !important;

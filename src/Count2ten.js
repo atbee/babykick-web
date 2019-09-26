@@ -10,14 +10,15 @@ const API = "https://babykick-api-dev.herokuapp.com";
 
 export default class Count2ten extends Component {
   initialize() {
+    console.log('Entering initialize state...')
     this.setState({ loading: true });
     liff.init(async () => {
       let profile = await liff.getProfile();
       this.setState({
         line_id: profile.userId
       });
-      this.checkToday();
-      // this.verifyUID();
+      // this.checkToday();
+      this.verifyUID();
     });
   }
 
@@ -49,14 +50,11 @@ export default class Count2ten extends Component {
         console.log(error);
         console.log("TODAY IS ALREADY COUNT!");
         liff.closeWindow();
-        // document.getElementById("pageisload").style.display = "none";
-        // document.getElementById("failurePage").style.display = "block";
-        // console.log("Couldn't detect UID");
       });
   }
 
   verifyUID() {
-    axios //checktimer status and send user to new or continue count
+    axios //checktimer status and send user to count
       .post(API + "/timer/status", this.state)
       .then(response => {
         console.log(response);
@@ -65,8 +63,7 @@ export default class Count2ten extends Component {
 
         if (this.state.status === "timeout") {
           document.getElementById("newCount").style.display = "block";
-          document.getElementById("pageisload").style.display = "none";
-          document.getElementById("continueCount").style.display = "none";        
+          document.getElementById("pageisload").style.display = "none";      
         } else if (this.state.status === "running" && this.state.countType === "ctt") {
           console.log("User still in ctt");
 
@@ -83,13 +80,13 @@ export default class Count2ten extends Component {
                 ctt_amount: data.ctt_amount
               });
 
-              this.setState({ apitime: dataUser[0].time }); // this is start time of count
-              this.setState({ timeTillDate: dataUser[0].timestamp });
-              this.setState({ count: dataUser[0].ctt_amount });
-              console.log(this.state.count);
-
+              this.setState({ 
+                apitime: dataUser[0].time,
+                timeTillDate: dataUser[0].timestamp,
+                count: dataUser[0].ctt_amount 
+              });
+              
               document.getElementById("pageisload").style.display = "none";
-              document.getElementById("continueCount").style.display = "none";
               document.getElementById("countPage").style.display = "block";
 
               setTimeout(() => { // this is a time out for loading time (UX)
@@ -242,45 +239,6 @@ export default class Count2ten extends Component {
       });
   };
 
-  continueHandler = e => {
-    e.preventDefault();
-    this.setState({ loading: true }); //set button state to loading (UX)
-
-    const { dataUser } = this.state;
-    axios
-      .post(API + "/get/current", this.state)
-      .then(response => {
-        console.log(response.data);
-        let data = response.data;
-        dataUser.push({
-          timestamp: data.timestamp,
-          time: data.time,
-          ctt_amount: data.ctt_amount
-        });
-
-        this.setState({ apitime: dataUser[0].time }); // this is start time of count
-        this.setState({ timeTillDate: dataUser[0].timestamp });
-        this.setState({ count: dataUser[0].ctt_amount });
-        console.log(this.state.count);
-
-        document.getElementById("continueCount").style.display = "none";
-        document.getElementById("countPage").style.display = "block";
-
-        setTimeout(() => {
-          this.setState({ loading: false });
-          document.getElementById("countdown-timer").style.display = "block";
-          document.getElementById("countdown-timer-loading").style.display =
-            "none";
-        }, 1000);
-
-        this.setState.count = 0;
-        document.getElementById("decButt").disabled = true;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
   incHandler = e => {
     e.preventDefault();
     console.log(this.state);
@@ -361,7 +319,7 @@ export default class Count2ten extends Component {
 
             {/* User enter count page (First time of day) */}
             <div id="newCount" style={{ display: "none" }}>
-              <div className="count-header">นับแบบ Count to ten (นับใหม่)</div>
+              <div className="count-header">การนับแบบ Count to ten</div>
               <div className="end-time">การนับลูกดิ้นแบบ Count to ten คือ</div>
               <div className="end-time">การนับให้ถึง 10 ครั้ง ภายในเวลา 12 ชั่วโมง</div>
               <div className="end-time">โดยสามารถเริ่มนับเมื่อเวลาใดก็ได้ที่คุณแม่สะดวก </div>
@@ -393,46 +351,6 @@ export default class Count2ten extends Component {
                   />
                 )}
                 {!loading && "เริ่ม"}
-              </Button>
-            </div>
-
-            {/* User comeback to count again. */}
-            <div id="continueCount" style={{ display: "none" }}>
-              <div className="count-header">นับแบบ Count to ten (นับต่อ)</div>
-              <div className="end-time">"นับให้ถึง 10 ภายใน 12 ชั่วโมง"</div>
-              <div className="end-time">คุณแม่สามารถนับลูกดิ้นเวลาใดก็ได้</div>
-              <div className="end-time">โดยหลังจากเริ่มนับ</div>
-              <div className="end-time">
-                ภายใน 12 ชั่วโมง ต้องนับได้ 10 ครั้งขึ้นไป
-              </div>
-
-              <Form.Group>
-                <Form.Control
-                  className="hide"
-                  name="line_id"
-                  type="text"
-                  placeholder="Line ID"
-                  value={line_id}
-                  onChange={this.changeHandler}
-                />
-              </Form.Group>
-
-              <Button
-                className="count-btn"
-                variant="danger"
-                type="submit"
-                onClick={this.continueHandler}
-                disabled={loading}
-              >
-                {loading && (
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="lg"
-                    role="status"
-                  />
-                )}
-                {!loading && "ต่อ"}
               </Button>
             </div>
 
