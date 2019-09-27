@@ -231,7 +231,7 @@ export default class Sadovsky extends Component {
         .format("HH:mm:ss"); // Real time of this.state.apitime - 7 hours (Local = minus 7, Server = minus 0)
 
       const endTime = moment(this.state.apitime, "HH:mm:ss")
-        .add(60, "seconds")
+        .add(12, "hours")
         .format("HH:mm:ss"); // End time + 5 hours (Local = add 5, Server = add 12)
 
       const leftTime = moment
