@@ -17,8 +17,8 @@ export default class Count2ten extends Component {
       this.setState({
         line_id: profile.userId
       });
-      // this.checkToday();
-      this.verifyUID();
+      this.checkToday();
+      // this.verifyUID();
     });
   }
 
@@ -63,8 +63,11 @@ export default class Count2ten extends Component {
 
         if (this.state.status === "timeout") {
           document.getElementById("newCount").style.display = "block";
-          document.getElementById("pageisload").style.display = "none";      
-        } else if (this.state.status === "running" && this.state.countType === "ctt") {
+          document.getElementById("pageisload").style.display = "none";
+        } else if (
+          this.state.status === "running" &&
+          this.state.countType === "ctt"
+        ) {
           console.log("User still in ctt");
 
           const { dataUser } = this.state;
@@ -80,16 +83,17 @@ export default class Count2ten extends Component {
                 ctt_amount: data.ctt_amount
               });
 
-              this.setState({ 
+              this.setState({
                 apitime: dataUser[0].time,
                 timeTillDate: dataUser[0].timestamp,
-                count: dataUser[0].ctt_amount 
+                count: dataUser[0].ctt_amount
               });
-              
+
               document.getElementById("pageisload").style.display = "none";
               document.getElementById("countPage").style.display = "block";
 
-              setTimeout(() => { // this is a time out for loading time (UX)
+              setTimeout(() => {
+                // this is a time out for loading time (UX)
                 this.setState({ loading: false });
                 document.getElementById("countdown-timer").style.display =
                   "block";
@@ -108,18 +112,20 @@ export default class Count2ten extends Component {
             .catch(error => {
               console.log(error);
             });
-
-        } else if (this.state.status === "running" && this.state.countType === "sdk") {
+        } else if (
+          this.state.status === "running" &&
+          this.state.countType === "sdk"
+        ) {
           console.log("User still in sdk!");
           axios
-          .post(API + "/check/btn/", this.state)
-          .then(response => {
-            console.log(response);
-            liff.closeWindow();
-          })
-          .catch(error => {
-            console.log(error);
-          });
+            .post(API + "/check/btn/", this.state)
+            .then(response => {
+              console.log(response);
+              liff.closeWindow();
+            })
+            .catch(error => {
+              console.log(error);
+            });
         }
         this.setState({ loading: false });
       })
@@ -319,10 +325,11 @@ export default class Count2ten extends Component {
 
             {/* User enter count page (First time of day) */}
             <div id="newCount" style={{ display: "none" }}>
-              <div className="count-header">การนับแบบ Count to ten</div>
-              <div className="end-time">การนับลูกดิ้นแบบ Count to ten คือ</div>
+              <img src="./baby-morning.png" alt="bg-right-down" className="failed bg-right-down"></img>
+              <div className="count-header">การนับแบบ Count to ten<span></span>⏱</div>
               <div className="end-time">การนับให้ถึง 10 ครั้ง ภายในเวลา 12 ชั่วโมง</div>
-              <div className="end-time">โดยสามารถเริ่มนับเมื่อเวลาใดก็ได้ที่คุณแม่สะดวก </div>
+              <div className="end-time">โดยสามารถเริ่มนับเมื่อเวลาใดก็ได้</div>
+              <div className="end-time">ที่คุณแม่สะดวก</div>
 
               <Form.Group>
                 <Form.Control
@@ -352,6 +359,7 @@ export default class Count2ten extends Component {
                 )}
                 {!loading && "เริ่ม"}
               </Button>
+              
             </div>
 
             {/* ---------------------------------------------------------------------------------------------------------------------------- */}
@@ -359,6 +367,11 @@ export default class Count2ten extends Component {
 
             {/* Countpage (obviously...) */}
             <div id="countPage" style={{ display: "none" }}>
+              <img
+                src="./baby-right.png"
+                alt="bg-left"
+                className="failed bg-right"
+              ></img>
               <Form>
                 <Form.Group>
                   <Form.Label className="">
@@ -407,16 +420,13 @@ export default class Count2ten extends Component {
                   {loading ? "เพิ่ม" : "เพิ่ม"}
                 </Button>
                 <div>
-                  <Button
-                    id="quitButt"
-                    variant="danger"
-                    type="submit"
-                    // className="count-btn"
+                  <img
+                    src="./quit.png"
+                    alt="quit"
+                    className="failed quit"
                     onClick={this.handleLeavePage}
                     disabled={loading}
-                  >
-                    {loading ? "พักหน้าจอ" : "พักหน้าจอ"}
-                  </Button>
+                  ></img>
                 </div>
               </Form>
             </div>

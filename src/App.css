@@ -96,7 +96,40 @@ img {
 }
 
 .sadov-count{
-  margin-top: 1rem;
+  margin-top: 0rem;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+}
+
+.bg-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.bg-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.bg-right-down {
+  position: absolute;
+  right: 0;
+  margin-right: 10px;
+  bottom: 0;
+  height: 110px
+}
+
+.quit{
+  position: absolute;
+  bottom: 0;
+  height: 35px;
+
+  left:  0;
+  right: 0;
+  margin: auto;
+  text-align: center;
 }
 
 /* COUNT PAGE */
@@ -138,6 +171,7 @@ img {
 .count-header {
   font-size: 1.25rem !important;
   font-weight: bold !important;
+  margin-bottom: 10px;
 }
 
 .count-text {

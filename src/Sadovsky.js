@@ -10,14 +10,15 @@ const API = "https://babykick-api-dev.herokuapp.com";
 
 export default class Sadovsky extends Component {
   initialize() {
+    console.log('Entering initialize state...')
     this.setState({ loading: true });
     liff.init(async () => {
       let profile = await liff.getProfile();
       this.setState({
         line_id: profile.userId
       });
-      // this.checkToday();
-      this.verifyUID();
+      this.checkToday();
+      // this.verifyUID();
     });
   }
 
@@ -434,17 +435,10 @@ export default class Sadovsky extends Component {
             </div>
 
             <div id="newCount" style={{ display: "none" }}>
-              <div className="count-header">การนับแบบ Sadovsky</div>
-              <div className="end-time">การนับลูกดิ้นแบบ Sadovsky คือ</div>
-              <div className="end-time">
-                การนับให้ถึง 3 ครั้ง ภายในเวลา 1 ชั่วโมง
-              </div>
-              <div className="end-time">
-                หลังมื้ออาหาร 3 มื้อ (เช้า เที่ยง เย็น)
-              </div>
-              <div className="end-time">
-                โดยในแต่ละมื้อต้องนับให้ได้ 3 ครั้งขึ้นไป
-              </div>
+              <img src="./baby-love.png" alt="bg-right-down" className="failed bg-right-down"></img>
+              <div className="count-header">การนับแบบ Sadovsky<span></span>🚀</div>
+              <div className="end-time">การนับให้ถึง 3 ครั้ง ภายในเวลา 1 ชั่วโมง</div>
+              <div className="end-time">หลังมื้อโดยในแต่ละมื้อต้องนับให้ได้ 3 ครั้งขึ้นไป</div>
 
               <Form.Group>
                 <Form.Control
@@ -474,6 +468,7 @@ export default class Sadovsky extends Component {
                 )}
                 {!loading && "เริ่ม"}
               </Button>
+              
             </div>
 
             {/* ---------------------------------------------------------------------------------------------------------------------------- */}
@@ -481,6 +476,7 @@ export default class Sadovsky extends Component {
 
             {/* Countpage (obviously...) */}
             <div id="countPage" style={{ display: "none" }}>
+            <img src="./baby-left.png" alt="bg-left" className="failed bg-left"></img>
               <Form>
                 <Form.Group className="time-form">
                   <Form.Label className="">
@@ -507,6 +503,28 @@ export default class Sadovsky extends Component {
                     </div>
                   </Form.Label>
                 </Form.Group>
+
+                <div
+                  id="goalcount"
+                  className="sadov-count"
+                  style={{ display: "block" }}
+                >
+                  <span role="img" aria-label="time">
+                    เป้าหมายการนับครั้งนี้คือ
+                  </span>{" "}
+                  3 ครั้ง🚩
+                </div>
+                <div
+                  id="finishcount"
+                  className="sadov-count"
+                  style={{ display: "none" }}
+                >
+                  <span role="img" aria-label="time">
+                    คุณแม่นับครบ
+                  </span>{" "}
+                  3 ครั้งแล้วค่ะ🚩
+                </div>
+
                 <Button
                   id="decButt"
                   variant="danger"
@@ -528,38 +546,14 @@ export default class Sadovsky extends Component {
                 >
                   {loading ? "เพิ่ม" : "เพิ่ม"}
                 </Button>
-                <br></br>
-                <div
-                  id="goalcount"
-                  className="end-time sadov-count"
-                  style={{ display: "block" }}
-                >
-                  <span role="img" aria-label="time">
-                    เป้าหมายการนับครั้งนี้คือ
-                  </span>{" "}
-                  3 ครั้ง
-                </div>
-                <div
-                  id="finishcount"
-                  className="end-time sadov-count"
-                  style={{ display: "none" }}
-                >
-                  <span role="img" aria-label="time">
-                    คุณแม่นับครบ
-                  </span>{" "}
-                  3 ครั้งแล้วค่ะ
-                </div>
                 <div>
-                  <Button
-                    id="quitButt"
-                    variant="danger"
-                    type="submit"
-                    // className="count-btn"
+                  <img
+                    src="./quit.png"
+                    alt="quit"
+                    className="failed quit"
                     onClick={this.handleLeavePage}
                     disabled={loading}
-                  >
-                    {loading ? "พักหน้าจอ" : "พักหน้าจอ"}
-                  </Button>
+                  ></img>
                 </div>
               </Form>
             </div>
