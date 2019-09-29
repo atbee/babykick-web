@@ -11,6 +11,7 @@ const API = "https://babykick-api-dev.herokuapp.com";
 
 export default class Register extends Component {
   initialize() {
+    console.log('Entering initialize state...')
     liff.init(async () => {
       let profile = await liff.getProfile();
       this.setState({
