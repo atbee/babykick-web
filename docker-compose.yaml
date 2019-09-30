@@ -1,14 +1,61 @@
 version: '3.3'
+
 services:
-  web:
-    container_name: babykick-web
+  bbk-web:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - '.:/usr/src/app'
-      - '/usr/src/app/node_modules'
+    image: bbk-web:$BUILD_TAG
+    container_name: babykick-web
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
     ports:
-      - '3000:3000'
-#    environment:
-#      - NODE_ENV=${NODE_ENV}
+      - "80:80"
+      - "443:443"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
+    depends_on:
+      - bbk-web
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/html --email p_athibet@kkumail.com --agree-tos --no-eff-email --force-renewal -d babykick.website  -d www.babykick.website
+
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/nc-user/bbk/babykick-web/views/
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/nc-user/bbk/babykick-web/dhparam/
+      o: bind
+
+networks:
+  app-network:
+    driver: bridge
