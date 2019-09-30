@@ -372,7 +372,7 @@ export default class Count2ten extends Component {
               <img
                 src="./baby-right.png"
                 alt="bg-left"
-                className="failed bg-right"
+                className="bg-right"
               ></img>
               <Form>
                 <Form.Group>

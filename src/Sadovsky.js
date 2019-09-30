@@ -476,7 +476,7 @@ export default class Sadovsky extends Component {
 
             {/* Countpage (obviously...) */}
             <div id="countPage" style={{ display: "none" }}>
-            <img src="./baby-left.png" alt="bg-left" className="failed bg-left"></img>
+            <img src="./baby-left.png" alt="bg-left" className="bg-left"></img>
               <Form>
                 <Form.Group className="time-form">
                   <Form.Label className="">
