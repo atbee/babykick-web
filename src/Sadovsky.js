@@ -23,8 +23,8 @@ export default class Sadovsky extends Component {
   }
 
   // initialize() {
-  //   // this.checkToday();
-  //   this.verifyUID();
+  //   this.checkToday();
+  //   // this.verifyUID();
   // }
 
   checkToday() {
@@ -41,25 +41,24 @@ export default class Sadovsky extends Component {
             liff.closeWindow();
           }, 2000);
         } else {
-          console.log("you can count today");
-          // this.verifyUID();
+          console.log("User can count today");
           axios // check if user can use sdk count at this time
             .post(API + "/check/sdk/" + line_id, this.state)
             .then(response => {
               console.log(response);
-              console.log("you can count sdk at this time period");
-              this.verifyUID(); // go to this function if user hasn't count today
+              console.log("User can count sdk at this time");
+              this.verifyUID();
             })
             .catch(error => {
               console.log(error);
-              console.log("you can not count sdk at this time period");
+              console.log("User can not count sdk at this time");
               liff.closeWindow();
             });
         }
       })
       .catch(error => {
         console.log(error);
-        console.log("TODAY IS ALREADY COUNT!");
+        console.log("User can not count today");
         liff.closeWindow();
       });
   }
@@ -134,7 +133,6 @@ export default class Sadovsky extends Component {
                 ).style.display = "none";
 
                 if (this.state.count === 0) {
-                  console.log("COUNT = 0");
                   document.getElementById("decButt").disabled = true;
                 } else {
                   document.getElementById("decButt").disabled = false;
@@ -315,8 +313,7 @@ export default class Sadovsky extends Component {
           // this is a time out for loading time (UX)
           this.setState({ loading: false });
           document.getElementById("countdown-timer").style.display = "block";
-          document.getElementById("countdown-timer-loading").style.display =
-            "none";
+          document.getElementById("countdown-timer-loading").style.display = "none";
 
           if (this.state.count === 0) {
             document.getElementById("decButt").disabled = true;
