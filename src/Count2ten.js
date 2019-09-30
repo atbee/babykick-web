@@ -425,7 +425,7 @@ export default class Count2ten extends Component {
                   <img
                     src="./quit.png"
                     alt="quit"
-                    className="failed quit"
+                    className="quit"
                     onClick={this.handleLeavePage}
                     disabled={loading}
                   ></img>
