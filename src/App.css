@@ -118,7 +118,7 @@ img {
   right: 0;
   margin-right: 10px;
   bottom: 0;
-  height: 110px
+  height: 110px;
 }
 
 .quit{
@@ -130,6 +130,11 @@ img {
   right: 0;
   margin: auto;
   text-align: center;
+}
+
+.failed {
+  height: 50px;
+  margin-bottom: 1rem;
 }
 
 /* COUNT PAGE */

@@ -574,7 +574,8 @@ export default class Sadovsky extends Component {
             <div id="failurePage" style={{ display: "none" }}>
               <img src="./failure.png" alt="failed" className="failed"></img>
               <br></br>
-              <div className="end-time"> ไม่พบ UID นี้ในระบบ </div>
+              <div className="end-time"> ไม่พบ UID นี้ในระบบ! </div>
+              <div className="end-time"> กรุณาลงทะเบียนค่ะ </div>
             </div>
           </div>
         </header>

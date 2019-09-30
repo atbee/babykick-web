@@ -24,6 +24,7 @@ export default class Count2ten extends Component {
 
   // initialize() {
   //   // this.checkToday();
+  //   console.log('Entering Count to ten page...');
   //   this.verifyUID();
   // }
 
@@ -40,7 +41,7 @@ export default class Count2ten extends Component {
           setTimeout(() => {
             this.setState({ loading: false });
             liff.closeWindow();
-          }, 2000);
+          }, 3000);
         } else {
           console.log("line id found.");
           this.verifyUID();
@@ -54,6 +55,7 @@ export default class Count2ten extends Component {
   }
 
   verifyUID() {
+    console.log('Posting to API for timer status')
     axios //checktimer status and send user to count
       .post(API + "/timer/status", this.state)
       .then(response => {
@@ -325,7 +327,7 @@ export default class Count2ten extends Component {
 
             {/* User enter count page (First time of day) */}
             <div id="newCount" style={{ display: "none" }}>
-              <img src="./baby-morning.png" alt="bg-right-down" className="failed bg-right-down"></img>
+              <img src="./baby-morning.png" alt="bg-right-down" className="bg-right-down"></img>
               <div className="count-header">การนับแบบ Count to ten<span></span>⏱</div>
               <div className="end-time">การนับให้ถึง 10 ครั้ง ภายในเวลา 12 ชั่วโมง</div>
               <div className="end-time">โดยสามารถเริ่มนับเมื่อเวลาใดก็ได้</div>
@@ -446,7 +448,9 @@ export default class Count2ten extends Component {
 
             <div id="failurePage" style={{ display: "none" }}>
               <img src="./failure.png" alt="failed" className="failed"></img>
-              <div className="end-time"> ไม่พบ UID นี้ในระบบ </div>
+              <br></br>
+              <div className="end-time"> ไม่พบ UID นี้ในระบบ! </div>
+              <div className="end-time"> กรุณาลงทะเบียนค่ะ </div>
             </div>
           </div>
         </header>

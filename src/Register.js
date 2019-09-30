@@ -17,9 +17,15 @@ export default class Register extends Component {
       this.setState({
         line_id: profile.userId
       });
+      console.log('Get UID completed going to register page...')
       this.verifyUID();
     });
   }
+
+  // initialize() {
+  //   // this.checkToday();
+  //   this.verifyUID();
+  // }
 
   verifyUID() {
     axios
@@ -43,6 +49,7 @@ export default class Register extends Component {
     super(props);
     this.state = {
       line_id: "",
+      // line_id: "U50240c7e4d230739b2a4343c4a1da542",
       mom_age: "",
       ges_age_week: "",
       loading: false
