@@ -9,23 +9,23 @@ const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
 
 export default class Sadovsky extends Component {
-  initialize() {
-    console.log('Entering initialize state...')
-    this.setState({ loading: true });
-    liff.init(async () => {
-      let profile = await liff.getProfile();
-      this.setState({
-        line_id: profile.userId
-      });
-      this.checkToday();
-      // this.verifyUID();
-    });
-  }
-
   // initialize() {
-  //   this.checkToday();
-  //   // this.verifyUID();
+  //   console.log('Entering initialize state...')
+  //   this.setState({ loading: true });
+  //   liff.init(async () => {
+  //     let profile = await liff.getProfile();
+  //     this.setState({
+  //       line_id: profile.userId
+  //     });
+  //     this.checkToday();
+  //     // this.verifyUID();
+  //   });
   // }
+
+  initialize() {
+    this.checkToday();
+    // this.verifyUID();
+  }
 
   checkToday() {
     this.setState({ loading: true });
@@ -183,8 +183,8 @@ export default class Sadovsky extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // line_id: "U50240c7e4d230739b2a4343c4a1da542",
-      line_id: "",
+      line_id: "U50240c7e4d230739b2a4343c4a1da542",
+      // line_id: "",
       dataUser: [],
       count: 0,
       countAll: 0,
@@ -432,7 +432,7 @@ export default class Sadovsky extends Component {
             </div>
 
             <div id="newCount" style={{ display: "none" }}>
-              <img src="./baby-love.png" alt="bg-right-down" className="failed bg-right-down"></img>
+              <img src="./baby-love.png" alt="bg-right-down" className="bg-right-down"></img>
               <div className="count-header">การนับแบบ Sadovsky<span></span>🚀</div>
               <div className="end-time">การนับให้ถึง 3 ครั้ง ภายในเวลา 1 ชั่วโมง</div>
               <div className="end-time">หลังมื้อโดยในแต่ละมื้อต้องนับให้ได้ 3 ครั้งขึ้นไป</div>
