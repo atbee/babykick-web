@@ -9,6 +9,7 @@ const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
 
 export default class Count2ten extends Component {
+  
   initialize() {
     console.log('Entering initialize state...')
     this.setState({ loading: true });
@@ -150,7 +151,6 @@ export default class Count2ten extends Component {
       timestamp: "",
       endTime: "",
       leftTime: "",
-      startTime: "",
       status_web: "exit",
       countType: ""
     };
@@ -174,25 +174,19 @@ export default class Count2ten extends Component {
     window.addEventListener("load", this.initialize);
     document.title = "Count to ten";
 
-    this.setState({ loading: true }); //set button state to loading (UX)
+    this.setState({ loading: true });
 
     this.interval = setInterval(async () => {
-      //get all time data
       const now = moment().unix() * 1000;
       const currentTime = moment(now).format("HH:mm:ss");
-      const startTime = moment(this.state.apitime, "HH:mm:ss")
-        .subtract(0, "hours")
-        .format("HH:mm:ss"); // Real time of this.state.apitime - 7 hours (Local = minus 7, Server = minus 0)
       const endTime = moment(this.state.apitime, "HH:mm:ss")
         .add(12, "hours")
-        .format("HH:mm:ss"); // End time + 5 hours (Local = add 5, Server = add 12)
-
+        .format("HH:mm:ss");
       const leftTime = moment
         .utc(moment(endTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss")))
         .format("HH:mm:ss");
 
       if (currentTime === endTime) {
-        // if time out
         document.getElementById("badEnding").style.display = "block";
         document.getElementById("countPage").style.display = "none";
         setTimeout(() => {
@@ -201,7 +195,7 @@ export default class Count2ten extends Component {
         }, 2000);
       }
 
-      this.setState({ endTime, leftTime, startTime });
+      this.setState({ endTime, leftTime });
     }, 1000);
   };
 

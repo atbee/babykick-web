@@ -9,23 +9,24 @@ const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
 
 export default class Sadovsky extends Component {
-  // initialize() {
-  //   console.log('Entering initialize state...')
-  //   this.setState({ loading: true });
-  //   liff.init(async () => {
-  //     let profile = await liff.getProfile();
-  //     this.setState({
-  //       line_id: profile.userId
-  //     });
-  //     this.checkToday();
-  //     // this.verifyUID();
-  //   });
-  // }
 
   initialize() {
-    this.checkToday();
-    // this.verifyUID();
+    console.log('Entering initialize state...')
+    this.setState({ loading: true });
+    liff.init(async () => {
+      let profile = await liff.getProfile();
+      this.setState({
+        line_id: profile.userId
+      });
+      this.checkToday();
+      // this.verifyUID();
+    });
   }
+
+  // initialize() {
+  //   // this.checkToday();
+  //   this.verifyUID();
+  // }
 
   checkToday() {
     this.setState({ loading: true });
@@ -45,7 +46,7 @@ export default class Sadovsky extends Component {
           axios // check if user can use sdk count at this time
             .post(API + "/check/sdk/" + line_id, this.state)
             .then(response => {
-              console.log(response);
+              console.log(response.data.sdk);
               console.log("User can count sdk at this time");
               this.verifyUID();
             })
@@ -183,8 +184,8 @@ export default class Sadovsky extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      line_id: "U50240c7e4d230739b2a4343c4a1da542",
-      // line_id: "",
+      // line_id: "U50240c7e4d230739b2a4343c4a1da542",
+      line_id: "",
       dataUser: [],
       count: 0,
       countAll: 0,
@@ -196,7 +197,6 @@ export default class Sadovsky extends Component {
       timestamp: "",
       endTime: "",
       leftTime: "",
-      startTime: "",
       status_web: "exit",
       count_status: "",
       countType: ""
@@ -221,23 +221,16 @@ export default class Sadovsky extends Component {
     window.addEventListener("load", this.initialize);
     document.title = "Sadovsky";
 
-    //get all time data
     this.interval = setInterval(async () => {
       const now = moment().unix() * 1000;
       const currentTime = moment(now).format("HH:mm:ss");
-      const startTime = moment(this.state.apitime, "HH:mm:ss")
-        .subtract(0, "hours")
-        .format("HH:mm:ss"); // Real time of this.state.apitime - 7 hours (Local = minus 7, Server = minus 0)
-
       const endTime = moment(this.state.apitime, "HH:mm:ss")
         .add(1, "hours")
-        .format("HH:mm:ss"); // End time + 5 hours (Local = add 5, Server = add 12)
-
+        .format("HH:mm:ss");
       const leftTime = moment
         .utc(moment(endTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss")))
         .format("HH:mm:ss");
 
-      // if time out
       if (currentTime === endTime && this.state.count >= 3) {
         document.getElementById("goodEnding").style.display = "block";
         document.getElementById("countPage").style.display = "none";
@@ -252,11 +245,7 @@ export default class Sadovsky extends Component {
           this.setState({ loading: false });
           liff.closeWindow();
         }, 2000);
-      } else if (
-        currentTime === endTime &&
-        this.state.count < 3 &&
-        this.state.count_status === "3rd"
-      ) {
+      } else if (currentTime === endTime && this.state.count < 3 && this.state.count_status === "3rd") {
         document.getElementById("badEnding").style.display = "block";
         document.getElementById("countPage").style.display = "none";
         setTimeout(() => {
@@ -265,7 +254,7 @@ export default class Sadovsky extends Component {
         }, 2000);
       }
 
-      this.setState({ endTime, leftTime, startTime });
+      this.setState({ endTime, leftTime });
     }, 1000);
   };
 
