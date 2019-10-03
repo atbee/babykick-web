@@ -5,8 +5,9 @@ import axios from "axios";
 
 const liff = window.liff;
 
-const API = "https://babykick-api-dev.herokuapp.com";
+// const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
+const API = 'https://api.babykickbot.site';
 
 
 export default class Register extends Component {
@@ -21,11 +22,6 @@ export default class Register extends Component {
       this.verifyUID();
     });
   }
-
-  // initialize() {
-  //   // this.checkToday();
-  //   this.verifyUID();
-  // }
 
   verifyUID() {
     axios

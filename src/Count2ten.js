@@ -5,8 +5,10 @@ import axios from "axios";
 import moment from "moment";
 
 const liff = window.liff;
-const API = "https://babykick-api-dev.herokuapp.com";
+
+// const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
+const API = 'https://api.babykickbot.site';
 
 export default class Count2ten extends Component {
   

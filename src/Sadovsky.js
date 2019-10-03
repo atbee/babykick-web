@@ -5,8 +5,9 @@ import axios from "axios";
 import moment from "moment";
 
 const liff = window.liff;
-const API = "https://babykick-api-dev.herokuapp.com";
+// const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
+const API = 'https://api.babykickbot.site';
 
 export default class Sadovsky extends Component {
 
@@ -43,18 +44,19 @@ export default class Sadovsky extends Component {
           }, 2000);
         } else {
           console.log("User can count today");
-          axios // check if user can use sdk count at this time
-            .post(API + "/check/sdk/" + line_id, this.state)
-            .then(response => {
-              console.log(response.data.sdk);
-              console.log("User can count sdk at this time");
-              this.verifyUID();
-            })
-            .catch(error => {
-              console.log(error);
-              console.log("User can not count sdk at this time");
-              liff.closeWindow();
-            });
+          this.verifyUID();
+          // axios // check if user can use sdk count at this time
+          //   .post(API + "/check/sdk/" + line_id, this.state)
+          //   .then(response => {
+          //     console.log(response.data.sdk);
+          //     console.log("User can count sdk at this time");
+          //     this.verifyUID();
+          //   })
+          //   .catch(error => {
+          //     console.log(error);
+          //     console.log("User can not count sdk at this time");
+          //     liff.closeWindow();
+          //   });
         }
       })
       .catch(error => {
@@ -149,7 +151,7 @@ export default class Sadovsky extends Component {
         ) {
           const { line_id } = this.state;
           axios // check if user can count only in ctt
-            .post(API + "/push/onlyctt/" + line_id, this.state)
+            .post(API + "/check/sdk" + line_id, this.state)
             .then(response => {
               console.log(response);
               liff.closeWindow();
