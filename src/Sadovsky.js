@@ -44,19 +44,19 @@ export default class Sadovsky extends Component {
           }, 2000);
         } else {
           console.log("User can count today");
-          this.verifyUID();
-          // axios // check if user can use sdk count at this time
-          //   .post(API + "/check/sdk/" + line_id, this.state)
-          //   .then(response => {
-          //     console.log(response.data.sdk);
-          //     console.log("User can count sdk at this time");
-          //     this.verifyUID();
-          //   })
-          //   .catch(error => {
-          //     console.log(error);
-          //     console.log("User can not count sdk at this time");
-          //     liff.closeWindow();
-          //   });
+          // this.verifyUID();
+          axios // check if user can use sdk count at this time
+            .post(API + "/check/sdk/" + line_id, this.state)
+            .then(response => {
+              console.log(response.data.sdk);
+              console.log("User can count sdk at this time");
+              this.verifyUID();
+            })
+            .catch(error => {
+              console.log(error);
+              console.log("User can not count sdk at this time");
+              liff.closeWindow();
+            });
         }
       })
       .catch(error => {
