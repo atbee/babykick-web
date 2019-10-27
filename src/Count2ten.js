@@ -8,7 +8,7 @@ const liff = window.liff;
 
 // const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
-const API = 'https://api.babykickbot.site';
+const API = 'https://api.babykick.site';
 
 export default class Count2ten extends Component {
   

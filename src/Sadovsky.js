@@ -7,7 +7,7 @@ import moment from "moment";
 const liff = window.liff;
 // const API = "https://babykick-api-dev.herokuapp.com";
 // const API = 'http://localhost:3001';
-const API = 'https://api.babykickbot.site';
+const API = 'https://api.babykick.site';
 
 export default class Sadovsky extends Component {
 
@@ -67,6 +67,7 @@ export default class Sadovsky extends Component {
   }
 
   verifyUID() {
+    console.log('Entering verifyUID function...');
     axios //checktimer status and send user to count
       .post(API + "/timer/status", this.state)
       .then(response => {
@@ -149,6 +150,7 @@ export default class Sadovsky extends Component {
           this.state.status === "timeout" &&
           this.state.sdk_status === "disable"
         ) {
+          console.log("status = timeout, SDK = disable");
           const { line_id } = this.state;
           axios // check if user can count only in ctt
             .post(API + "/check/sdk" + line_id, this.state)
