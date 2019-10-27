@@ -5,56 +5,91 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: bbk-web:$BUILD_TAG
+    image: bbk-web:14
     container_name: babykick-web
     restart: unless-stopped
+    environment:
+      - TZ=Asia/Bangkok
+      - VIRTUAL_HOST=babykickbot.site,www.babykickbot.site
+      - LETSENCRYPT_HOST=babykickbot.site,www.babykickbot.site,api.babykickbot.site,line.babykickbot.site,report.babykickbot.site
+      - LETSENCRYPT_EMAIL=p_athibet@kkumail.com
+    networks:
+      - app-network
+  
+  bbk-api:
+    image: bbk-api:17
+    container_name: babykick-api
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - TZ=Asia/Bangkok
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_HOST=api.babykickbot.site
+    networks:
+      - app-network 
+
+  bbk-report:
+    image: bbk-report:2
+    container_name: babykick-report
+    restart: always
+    ports:
+      - '3001:3001'
+    environment:
+      - TZ=Asia/Bangkok
+      - VIRTUAL_PORT=3001
+      - VIRTUAL_HOST=report.babykickbot.site
+    volumes:
+      - /uploads:/uploads
+    networks:
+      - app-network
+
+  bbk-line:
+    image: bbk-line:3
+    container_name: babykick-line
+    restart: always
+    ports:
+      - '8080:8080'
+    environment:
+      - TZ=Asia/Bangkok
+      - VIRTUAL_PORT=8080
+      - VIRTUAL_HOST=line.babykickbot.site
     networks:
       - app-network
 
   webserver:
-    image: nginx:alpine
+    image: jwilder/nginx-proxy
     container_name: webserver
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - web-root:/var/www/html
-      - ./nginx-conf:/etc/nginx/conf.d
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - dhparam:/etc/ssl/certs
+      - /etc/timezone:/etc/timezone:ro
+      - ./current/public:/usr/share/nginx/html
+      - ./certs:/etc/nginx/certs:ro
+      - vhost:/etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
     depends_on:
       - bbk-web
     networks:
       - app-network
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
 
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
     volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - web-root:/var/www/html
-    depends_on:
-      - webserver
-    command: certonly --webroot --webroot-path=/var/www/html --email p_athibet@kkumail.com --agree-tos --no-eff-email --force-renewal -d babykick.website  -d www.babykick.website
+      - /etc/timezone:/etc/timezone
+      - ./certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - vhost:/etc/nginx/vhost.d
+      - ./current/public:/usr/share/nginx/html
 
 volumes:
-  certbot-etc:
-  certbot-var:
-  web-root:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/nc-user/bbk/babykick-web/views/
-      o: bind
-  dhparam:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/nc-user/bbk/babykick-web/dhparam/
-      o: bind
+  vhost:
 
 networks:
   app-network:
